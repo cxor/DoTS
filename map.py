@@ -4,8 +4,9 @@ import numpy as np
 
 class Map:
 
-    #WAYPOINT_ACTIVATION_STOC_V = [0.95, 0.50, 0.25, 0.15]
-    WAYPOINT_ACTIVATION_STOC_V = [0.8]
+    # WAYPOINT_ACTIVATION_STOC_V = [0.95, 0.50, 0.25, 0.15]
+    WAYPOINT_ACTIVATION_STOC_V = [0.95, 0.60, 0.45, 0.25]
+    # WAYPOINT_ACTIVATION_STOC_V = [0.8]
 
     # Map object is defined by:
     #   - topology [blank, roads]
@@ -30,9 +31,11 @@ class Map:
             for col in range(self.size[1]):
                 for row in range(self.size[0]):
                     if self.topology[col][row].get_status() == 1:
-                        print("\u25cf", sep=" ", end="")
+                        # print("\u25cf", sep=" ", end="")
+                        print("\u2022", sep=" ", end="")    # road
                     else:
-                        print("\u25cb", sep=" ", end="")
+                        # print("\u25cb", sep=" ", end="")
+                        print("\u0394", sep=" ", end="")    # obstacle
                     if row == (self.size[0] - 1):
                         print()
         return None
@@ -81,18 +84,21 @@ class Map:
                     # section below is used to select eligible neighbors,
                     # restricting the overall possibilies for the current
                     # border waypoint.
+                    # print("\nHERE 1")
                     eligible_neighbors = [waypoint_matrix[i][j+1],
                                             waypoint_matrix[i+1][j],
                                             waypoint_matrix[i+1][j+1]]
                     initial_row = True
 
                 if (i == rows_no-1) and (j != columns_no-1):
+                    # print("\nHERE 2")
                     ### Last row of the waypoint matrix
                     eligible_neighbors = [waypoint_matrix[i][j+1],
                                             waypoint_matrix[i-1][j+1]]
                     end_row = True
 
                 if (j == columns_no-1):
+                    # print("\nHERE 3")
                     # Last column of the waypoint matrix
                     end_column = True
                     initial_row = False
@@ -101,22 +107,28 @@ class Map:
 
                 if end_column and end_row:
                     return waypoint_matrix
-                elif not(end_column or end_row or initial_row):
+                
+                if (i != 0) and (i != rows_no-1) and (j != columns_no-1):
                     ### Common case: Chebyshev 8-way connections
+                    # print("\nHERE")
                     eligible_neighbors = [waypoint_matrix[i-1][j+1],
                         waypoint_matrix[i][j+1],
                         waypoint_matrix[i+1][j],
                         waypoint_matrix[i+1][j+1]]
                 
+                # print("Waypoint:"+str(current_waypoint.get_coordinates())+" Eligible neighbors:")
+                # for neighbor_waypoint in eligible_neighbors:
+                #     print(str(neighbor_waypoint.get_coordinates()))
+
                 for neighbor_waypoint in eligible_neighbors:
                     activation_seed = round(np.random.uniform(0, 1), 2)
                     activation_threshold = np.random.choice(Map.WAYPOINT_ACTIVATION_STOC_V)
-                    ### print(f"Waypoint: {current_waypoint.get_coordinates()} - {activation_seed},{activation_threshold} ", end="")
+                    # print(f"Waypoint: {current_waypoint.get_coordinates()} - {activation_seed},{activation_threshold} ", end="")
                     if activation_seed <= activation_threshold:
-                        ### print("OK")
                         current_waypoint.add_neighbor(neighbor_waypoint)
                         neighbor_waypoint.add_neighbor(current_waypoint)
                         neighbor_waypoint.set_status(1)
+                        # print(" OK ->" + str(neighbor_waypoint.get_coordinates()))
                     else:
                         pass
                         ### print("NOPE")
