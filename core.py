@@ -6,13 +6,19 @@ from node import Node
 
 
 def main():
-    simulation_map = Map(topology="roads", size=[20,10])
+    nodes = []
+    while len(nodes) < 4:       # Voglio una mappa significativa, no?
+        simulation_map = Map(topology="roads", size=[20,10])
+        nodes = simulation_map.add_nodes()
+
     print("Topology: ")
     simulation_map.draw_topology()
     print("\nInitial condition: ")
-    nodes = simulation_map.add_nodes()
     for i in range(len(nodes)):
-        print(str(nodes[i].get_position()))
+        print(f"\nNode {i}", end="\n")
+        print(f"  Start position: {nodes[i].get_start()} - Target waypoint: {nodes[i].get_target()}", end="\n")
+        print(f"Path to be followed: {nodes[i].get_path()}")
+        # print(str(nodes[i].get_position()))
     simulation_map.draw_with_nodes()
     return
 

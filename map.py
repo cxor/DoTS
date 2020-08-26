@@ -177,9 +177,13 @@ class Map:
         # for i in possible_positions:
         #     print(str(i.get_coordinates()))
 
+        pos_left = [x for x in available_spaces if x not in possible_positions] # I'm sure they're more than the number of nodes, no need for checks
+        sample_left = random.sample(pos_left, number_of_nodes)
+
         for n in range(number_of_nodes):
             #print(n)
-            node = Node(coords=possible_positions[n].get_coordinates(), start=possible_positions[n].get_coordinates())
+            node = Node(coords=possible_positions[n].get_coordinates(), start=possible_positions[n].get_coordinates(), target=sample_left[n].get_coordinates())
+            node.set_path(self)
             nodes.append(node)
             self.topology[possible_positions[n].get_coordinates()[0],possible_positions[n].get_coordinates()[1]].status=2
             #print(str(nodes[n].get_position()))
