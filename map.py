@@ -1,5 +1,7 @@
 from waypoint import Waypoint
+from node import Node
 import numpy as np
+import random
 
 
 class Map:
@@ -22,6 +24,7 @@ class Map:
         self.size = size
         self.active_locations = []
         self.initialize_map(topology=self.topology, size=self.size)
+        self.nodes = []
 
     def get_topology(self):
         return self.topology
@@ -33,6 +36,22 @@ class Map:
                     if self.topology[col][row].get_status() == 1:
                         # print("\u25cf", sep=" ", end="")
                         print("\u2022", sep=" ", end="")    # road
+                    else:
+                        # print("\u25cb", sep=" ", end="")
+                        print("\u0394", sep=" ", end="")    # obstacle
+                    if row == (self.size[0] - 1):
+                        print()
+        return None
+
+    def draw_with_nodes(self):
+        if self.topology is not None:
+            for col in range(self.size[1]):
+                for row in range(self.size[0]):
+                    if self.topology[col][row].get_status() == 1:
+                        # print("\u25cf", sep=" ", end="")
+                        print("\u2022", sep=" ", end="")    # road
+                    elif self.topology[col][row].get_status() == 2:
+                        print("N", sep=" ", end="")
                     else:
                         # print("\u25cb", sep=" ", end="")
                         print("\u0394", sep=" ", end="")    # obstacle
@@ -57,6 +76,9 @@ class Map:
                 for j in range(self.size[0]):
                     if self.topology[i][j].get_status() == 1:
                         self.active_locations.append(self.topology[i][j])
+            
+            self.nodes = self.add_nodes()
+
         return None
 
     def generate_waypoint_network(self, size):
@@ -133,3 +155,33 @@ class Map:
                         pass
                         ### print("NOPE")
         return waypoint_matrix
+
+
+    def add_nodes(self):
+        columns_no = self.size[0]
+        rows_no = self.size[1]
+        road_spaces = 0
+        available_spaces = []
+        for i in range(rows_no):
+            for j in range(columns_no):
+                if self.topology[i][j].get_status() == 1:
+                    road_spaces = road_spaces + 1
+                    if i!=0 and j!=0:
+                        available_spaces.append(self.topology[i][j])    # i don't want to place nodes in the sink
+        
+        number_of_nodes = road_spaces // 12     # looks like a resonable number of nodes in such a map
+        # nodes = np.full(shape=number_of_nodes, fill_value=Node())
+        nodes = []
+
+        possible_positions = random.sample(available_spaces, number_of_nodes)
+        # for i in possible_positions:
+        #     print(str(i.get_coordinates()))
+
+        for n in range(number_of_nodes):
+            #print(n)
+            node = Node(coords=possible_positions[n].get_coordinates(), start=possible_positions[n].get_coordinates())
+            nodes.append(node)
+            self.topology[possible_positions[n].get_coordinates()[0],possible_positions[n].get_coordinates()[1]].status=2
+            #print(str(nodes[n].get_position()))
+
+        return nodes

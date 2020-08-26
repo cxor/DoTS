@@ -3,7 +3,7 @@ class Waypoint:
     def __init__(self, coordinates=[-1,-1], neighbors=[], status=0):
         self.coordinates = coordinates
         self.neighbors = neighbors
-        self.status = status
+        self.status = status    # 0: obstacle, 1: road (empty), 2: node (on the road)
 
     def set_coordinates(self, coordinates):
         self.coordinates = coordinates
