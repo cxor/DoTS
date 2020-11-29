@@ -26,6 +26,9 @@ class Map:
         self.initialize_map(topology=self.topology, size=self.size)
         self.nodes = []
 
+    def get_nodes(self):
+        return self.nodes
+
     def get_topology(self):
         return self.topology
 
@@ -35,10 +38,12 @@ class Map:
                 for row in range(self.size[0]):
                     if self.topology[col][row].get_status() == 1:
                         # print("\u25cf", sep=" ", end="")
-                        print("\u2022", sep=" ", end="")    # road
+                        # print("\u2022", sep=" ", end="")    # road
+                        print(".", sep=" ", end="")
                     else:
                         # print("\u25cb", sep=" ", end="")
-                        print("\u0394", sep=" ", end="")    # obstacle
+                        # print("\u0394", sep=" ", end="")    # obstacle
+                        print("O", sep=" ", end="")
                     if row == (self.size[0] - 1):
                         print()
         return None
@@ -49,12 +54,14 @@ class Map:
                 for row in range(self.size[0]):
                     if self.topology[col][row].get_status() == 1:
                         # print("\u25cf", sep=" ", end="")
-                        print("\u2022", sep=" ", end="")    # road
-                    elif self.topology[col][row].get_status() == 2:
-                        print("N", sep=" ", end="")
+                        # print("\u2022", sep=" ", end="")    # road
+                        print(".", sep=" ", end="")
+                    elif self.topology[col][row].get_status() == 0:
+                        print("0", sep=" ", end="")
                     else:
                         # print("\u25cb", sep=" ", end="")
-                        print("\u0394", sep=" ", end="")    # obstacle
+                        # print("\u0394", sep=" ", end="")    # obstacle
+                        print("N", sep=" ", end="")
                     if row == (self.size[0] - 1):
                         print()
         return None
@@ -77,7 +84,7 @@ class Map:
                     if self.topology[i][j].get_status() == 1:
                         self.active_locations.append(self.topology[i][j])
             
-            self.nodes = self.add_nodes()
+            # self.nodes = self.add_nodes()
 
         return None
 
@@ -170,6 +177,7 @@ class Map:
                         available_spaces.append(self.topology[i][j])    # i don't want to place nodes in the sink
         
         number_of_nodes = road_spaces // 12     # looks like a resonable number of nodes in such a map
+        print(f"NUMBER OF NODES = {number_of_nodes}")
         # nodes = np.full(shape=number_of_nodes, fill_value=Node())
         nodes = []
 
@@ -185,7 +193,7 @@ class Map:
             node = Node(coords=possible_positions[n].get_coordinates(), start=possible_positions[n].get_coordinates(), target=sample_left[n].get_coordinates())
             node.set_path(self)
             nodes.append(node)
-            self.topology[possible_positions[n].get_coordinates()[0],possible_positions[n].get_coordinates()[1]].status=2
+            self.topology[possible_positions[n].get_coordinates()[0]][possible_positions[n].get_coordinates()[1]].set_status(2)
             #print(str(nodes[n].get_position()))
 
         return nodes

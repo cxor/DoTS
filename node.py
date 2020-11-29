@@ -42,7 +42,13 @@ class Node:
         return self.parent
 
     def set_path(self, network_matrix):
-        self.path = self.movement(topology=network_matrix)
+        core_path = self.movement(topology=network_matrix)
+        self.path = []
+        (self.path).append(self.get_start())
+        for i in core_path:
+            (self.path).append(i)
+        for i in reversed(core_path):   # this because we need to go back and forth
+            (self.path).append(i)
         return None
 
     def get_path(self):
