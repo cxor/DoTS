@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from map import Map
 from node import Node
 from waypoint import Waypoint
+import time
 
 
 def main():
@@ -24,6 +25,16 @@ def main():
     # return
 
     # Now I try to get the nodes moving
+    # by using t as time unit, the while loop iterates
+    # through the points (coordinates) that compose the
+    # path that each node has to repeatedly walk on 
+    # that same path was decided at the beginning, during the 
+    # generation of the map.
+    # At each "clock" (each iteration) the nodes take one step
+    # upon their path (thanks to the modulus operation with t)
+    # and continue to go back and forth as long as we want (duration of the while loop)
+    # obviously in order to move the nodes we must update the
+    # status of the cell in the topology (lines where .topology is called)
     t = -1 # time unit
     while(t<30):
         print("\n")
@@ -37,7 +48,9 @@ def main():
             print(f"Node was in {old_coords} and now goes in {new_coords}")
             simulation_map.topology[new_coords[0]][new_coords[1]].set_status(2)
         print(f"Time = {t}")
+        print(chr(27) + "[2J") # escape sequence that clears the screen in linux terminal so that the drawing looks like it is updating itself
         simulation_map.draw_with_nodes()
+        time.sleep(1)
     return
 
 
