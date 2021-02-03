@@ -5,6 +5,7 @@ from map import Map
 from node import Node
 from waypoint import Waypoint
 import time
+import itertools
 
 
 def main():
@@ -35,6 +36,9 @@ def main():
     # and continue to go back and forth as long as we want (duration of the while loop)
     # obviously in order to move the nodes we must update the
     # status of the cell in the topology (lines where .topology is called)
+    
+    #fare un check se due nodi hanno la stessa posizione, in quel caso scambiare il messaggio
+    
     t = -1 # time unit
     while(t<30):
         print("\n")
@@ -47,11 +51,21 @@ def main():
             node.set_position(new_coords)
             print(f"Node was in {old_coords} and now goes in {new_coords}")
             simulation_map.topology[new_coords[0]][new_coords[1]].set_status(2)
+        for a, b in itertools.combinations(nodes, 2):
+            if a.get_position() == b.get_position():
+                a.exchange_message(b)
         print(f"Time = {t}")
-        print(chr(27) + "[2J") # escape sequence that clears the screen in linux terminal so that the drawing looks like it is updating itself
+        #print(chr(27) + "[2J") # escape sequence that clears the screen in linux terminal so that the drawing looks like it is updating itself
         simulation_map.draw_with_nodes()
         time.sleep(1)
+    
+    for node in nodes:
+        print(str(node) + "received " + str(node.get_received_packet()) + " not received " + str(node.get_not_received_packet()))
+        print("\n")
+    
     return
+
+    
 
 
 if __name__ == "__main__":

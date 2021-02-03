@@ -2,17 +2,26 @@ from waypoint import Waypoint
 
 class Node:
 
-    def __init__(self, coords=[-1,-1], start=[-1,-1], target=[-1,-1], par=None):
+    def __init__(self, transmission_time=0, speed=0, coords=[-1,-1], start=[-1,-1], target=[-1,-1], par=None):
         self.position = Waypoint(coordinates=coords)
         self.start = Waypoint(coordinates=start)
         self.target = Waypoint(coordinates=target)
         self.path = []
-
         self.g = 0
         self.h = 0
         self.f = 0
         self.parent = par
-
+        self.transmission_time = transmission_time
+        self.speed = speed
+        self.packet_received = 0
+        self.packet_not_received = 0
+        
+    def get_transmission_time(self):
+        return self.transmission_time
+    
+    def get_speed(self):
+        return self.speed
+        
     def set_position(self, coords):
         self.position.set_coordinates(coords)
         return None
@@ -40,6 +49,12 @@ class Node:
 
     def get_parent(self):
         return self.parent
+    
+    def get_received_packet(self):
+        return self.packet_received
+    
+    def get_not_received_packet(self):
+        return self.packet_not_received
 
     def set_path(self, network_matrix):
         core_path = self.movement(topology=network_matrix)
@@ -98,7 +113,7 @@ class Node:
                     continue
 
                 map_value = topology.topology[next[0]][next[1]].get_status()
-
+ 
                 if(map_value == 0):
                     continue
 
@@ -116,6 +131,23 @@ class Node:
                     open.append(neighbor)
 
         return None     # no path is found - should not happen
+    
+    def exchange_message(self, node):
+        
+        #check the probability of exchange messages
+        speed_node1 = node.get_speed()
+        transmission1 = node.get_transmission_time()
+        speed_node2 = self.get_speed()
+        transmission2 = self.get_transmission_time()
+        signal_intensity = abs(speed_node1 + speed_node2)*(transmission1 + transmission2)
+      
+        if signal_intensity > 3:
+            print("bomba")
+            self.packet_received += 1
+            print(self.packet_received)
+        else:
+            self.packet_not_received += 1
+    
 
 def add_to_open(open, neighbor):
     for node in open:

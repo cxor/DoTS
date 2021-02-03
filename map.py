@@ -190,7 +190,7 @@ class Map:
 
         for n in range(number_of_nodes):
             #print(n)
-            node = Node(coords=possible_positions[n].get_coordinates(), start=possible_positions[n].get_coordinates(), target=sample_left[n].get_coordinates())
+            node = Node(12,24,coords=possible_positions[n].get_coordinates(), start=possible_positions[n].get_coordinates(), target=sample_left[n].get_coordinates())
             node.set_path(self) # this functions calls the A* algorithm that decides the path upon which the node will move.
             nodes.append(node)
             self.topology[possible_positions[n].get_coordinates()[0]][possible_positions[n].get_coordinates()[1]].set_status(2)

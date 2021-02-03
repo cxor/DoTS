@@ -29,3 +29,5 @@ class Waypoint:
     def show_info(self):
         print(f"Waypoint coordinates: {self.coordinates}, status: {self.status}")
         return None
+    
+    
