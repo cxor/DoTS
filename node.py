@@ -142,10 +142,11 @@ class Node:
         signal_intensity = abs(speed_node1 + speed_node2)*(transmission1 + transmission2)
       
         if signal_intensity > 3:
-            print("bomba")
+            print("Messages exchanged")
             self.packet_received += 1
             print(self.packet_received)
         else:
+            print("Messages not exchanged")
             self.packet_not_received += 1
     
 

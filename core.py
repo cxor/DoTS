@@ -13,7 +13,9 @@ def main():
     while len(nodes) < 4:       # Voglio una mappa significativa, no?
         simulation_map = Map(topology="roads", size=[20,10])
         nodes = simulation_map.add_nodes()
+        sinks = simulation_map.add_sinks()
 
+    print(sinks)
     print("Topology: ")
     simulation_map.draw_topology()
     print("\nInitial condition: ")
@@ -54,6 +56,12 @@ def main():
         for a, b in itertools.combinations(nodes, 2):
             if a.get_position() == b.get_position():
                 a.exchange_message(b)
+                
+        for node in nodes:
+            for sink in sinks:
+                if node.get_position() == sink.get_position():
+                    print("Sink and node on the same position")
+                    
         print(f"Time = {t}")
         #print(chr(27) + "[2J") # escape sequence that clears the screen in linux terminal so that the drawing looks like it is updating itself
         simulation_map.draw_with_nodes()

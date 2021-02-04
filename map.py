@@ -2,7 +2,7 @@ from waypoint import Waypoint
 from node import Node
 import numpy as np
 import random
-
+from sink import Sink
 
 class Map:
 
@@ -40,6 +40,10 @@ class Map:
                         # print("\u25cf", sep=" ", end="")
                         # print("\u2022", sep=" ", end="")    # road
                         print(".", sep=" ", end="")
+                    if self.topology[col][row].get_status() == 3:
+                        # print("\u25cf", sep=" ", end="")
+                        # print("\u2022", sep=" ", end="")    # road
+                        print("S", sep=" ", end="")
                     else:
                         # print("\u25cb", sep=" ", end="")
                         # print("\u0394", sep=" ", end="")    # obstacle
@@ -58,6 +62,8 @@ class Map:
                         print(".", sep=" ", end="")
                     elif self.topology[col][row].get_status() == 0:
                         print("0", sep=" ", end="")
+                    elif self.topology[col][row].get_status() == 3:
+                        print("S", sep=" ", end="")
                     else:
                         # print("\u25cb", sep=" ", end="")
                         # print("\u0394", sep=" ", end="")    # obstacle
@@ -190,10 +196,42 @@ class Map:
 
         for n in range(number_of_nodes):
             #print(n)
-            node = Node(12,24,coords=possible_positions[n].get_coordinates(), start=possible_positions[n].get_coordinates(), target=sample_left[n].get_coordinates())
+            speed = random.randint(20, 80)
+            node = Node(12,speed,coords=possible_positions[n].get_coordinates(), start=possible_positions[n].get_coordinates(), target=sample_left[n].get_coordinates())
             node.set_path(self) # this functions calls the A* algorithm that decides the path upon which the node will move.
             nodes.append(node)
             self.topology[possible_positions[n].get_coordinates()[0]][possible_positions[n].get_coordinates()[1]].set_status(2)
             #print(str(nodes[n].get_position()))
 
         return nodes
+    
+    def add_sinks(self):
+        columns_no = self.size[0]
+        rows_no = self.size[1]
+        road_spaces = 0
+        available_spaces = []
+        for i in range(rows_no):
+            for j in range(columns_no):
+                if self.topology[i][j].get_status() == 1:
+                    road_spaces = road_spaces + 1
+                    if i!=0 and j!=0:
+                        available_spaces.append(self.topology[i][j])    # i don't want to place nodes in the sink
+        
+        number_of_sinks =  10    # looks like a resonable number of nodes in such a map
+        print(f"NUMBER OF SINKS = {number_of_sinks}")
+        
+        sinks = []
+
+        possible_positions = random.sample(available_spaces, number_of_sinks)
+    
+        
+
+        for n in range(number_of_sinks):
+            #print(n)
+            sink = Sink(coords=possible_positions[n].get_coordinates())
+            # this functions calls the A* algorithm that decides the path upon which the node will move.
+            sinks.append(sink)
+            self.topology[possible_positions[n].get_coordinates()[0]][possible_positions[n].get_coordinates()[1]].set_status(3)
+            #print(str(nodes[n].get_position()))
+
+        return sinks
