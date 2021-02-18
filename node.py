@@ -1,4 +1,7 @@
 from waypoint import Waypoint
+import queue
+import random
+
 
 class Node:
 
@@ -13,8 +16,13 @@ class Node:
         self.parent = par
         self.transmission_time = transmission_time
         self.speed = speed
-        self.packet_received = 0
-        self.packet_not_received = 0
+        self.n_packet_generated = 0
+        self.n_packet_received = 0
+        self.n_packet_not_received = 0
+        self.n_packet_sent = 0
+        self.n_packet_not_sent = 0
+        self.packets_generated = queue.Queue()
+        self.packets_received = queue.Queue()
         
     def get_transmission_time(self):
         return self.transmission_time
@@ -50,11 +58,11 @@ class Node:
     def get_parent(self):
         return self.parent
     
-    def get_received_packet(self):
-        return self.packet_received
+    def get_n_received_packet(self):
+        return self.n_packet_received
     
-    def get_not_received_packet(self):
-        return self.packet_not_received
+    def get_n_not_received_packet(self):
+        return self.n_packet_not_received
 
     def set_path(self, network_matrix):
         core_path = self.movement(topology=network_matrix)
@@ -141,13 +149,27 @@ class Node:
         transmission2 = self.get_transmission_time()
         signal_intensity = abs(speed_node1 + speed_node2)*(transmission1 + transmission2)
       
+        
+      #piu è vicino alla treshold piu pacchetti vengono scambiati
         if signal_intensity > 3:
             print("Messages exchanged")
-            self.packet_received += 1
-            print(self.packet_received)
+            while node.packets_generated.qsize()!=0:
+                self.packets_received.put(node.packets_generated.get())
+                
+            self.n_packet_received += self.packets_received.qsize()
+            
         else:
             print("Messages not exchanged")
-            self.packet_not_received += 1
+            self.n_packet_not_received += 1
+            
+     #genera un numero di pacchetti random ad ogni passo      
+    def generate_packets(self):
+        rate = random.randint(1,5)
+        i=0
+        while i<rate:
+            self.packets_generated.put("packet")
+            self.n_packet_generated +=1
+            i +=1
     
 
 def add_to_open(open, neighbor):

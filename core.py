@@ -42,20 +42,23 @@ def main():
     #fare un check se due nodi hanno la stessa posizione, in quel caso scambiare il messaggio
     
     t = -1 # time unit
-    while(t<30):
+    while(t<10):
         print("\n")
         t = t+1
         for node in nodes:
             path_len = len(node.get_path())
+            
             old_coords = node.get_position()
             simulation_map.topology[old_coords[0]][old_coords[1]].set_status(1)
             new_coords = node.get_path()[t%path_len]
             node.set_position(new_coords)
+            node.generate_packets()
             print(f"Node was in {old_coords} and now goes in {new_coords}")
             simulation_map.topology[new_coords[0]][new_coords[1]].set_status(2)
         for a, b in itertools.combinations(nodes, 2):
             if a.get_position() == b.get_position():
                 a.exchange_message(b)
+                b.exchange_message(a)
                 
         for node in nodes:
             for sink in sinks:
@@ -68,9 +71,11 @@ def main():
         time.sleep(1)
     
     for node in nodes:
-        print(str(node) + "received " + str(node.get_received_packet()) + " not received " + str(node.get_not_received_packet()))
+        print(str(node) + "received " + str(node.get_n_received_packet()) + " not received " + str(node.get_n_not_received_packet()))
+        print(str(node) + "total packets generated : " + str(node.n_packet_generated))
+        print(str(node) + "queue packet gen :" +str(node.packets_generated.queue))
+        print(str(node) + "queue packet rec :" +str(node.packets_received.queue))
         print("\n")
-    
     return
 
     
