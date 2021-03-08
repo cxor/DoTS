@@ -16,11 +16,12 @@ class Node:
         self.parent = par
         self.transmission_time = transmission_time
         self.speed = speed
-        self.n_packet_generated = 0
-        self.n_packet_received = 0
-        self.n_packet_not_received = 0
-        self.n_packet_sent = 0
-        self.n_packet_not_sent = 0
+        self.rate = random.randint(1,5)
+        self.n_packets_generated = 0
+        self.n_packets_received = 0
+        self.n_packets_not_received = 0
+        self.n_packets_sent = 0
+        self.n_packets_not_sent = 0
         self.packets_generated = queue.Queue()
         self.packets_received = queue.Queue()
         
@@ -29,6 +30,9 @@ class Node:
     
     def get_speed(self):
         return self.speed
+    
+    def get_rate(self):
+        return self.rate
         
     def set_position(self, coords):
         self.position.set_coordinates(coords)
@@ -59,10 +63,10 @@ class Node:
         return self.parent
     
     def get_n_received_packet(self):
-        return self.n_packet_received
+        return self.n_packets_received
     
     def get_n_not_received_packet(self):
-        return self.n_packet_not_received
+        return self.n_packets_not_received
 
     def set_path(self, network_matrix):
         core_path = self.movement(topology=network_matrix)
@@ -143,32 +147,32 @@ class Node:
     def exchange_message(self, node):
         
         #check the probability of exchange messages
-        speed_node1 = node.get_speed()
-        transmission1 = node.get_transmission_time()
-        speed_node2 = self.get_speed()
-        transmission2 = self.get_transmission_time()
-        signal_intensity = abs(speed_node1 + speed_node2)*(transmission1 + transmission2)
-      
+        speed_node_b = node.get_speed()
+        transmission_b = node.get_transmission_time()
+        speed_node_a = self.get_speed()
+        transmission_a = self.get_transmission_time()
+        signal_intensity = abs(speed_node_b + speed_node_a)*(transmission_b + transmission_a)
+        print(signal_intensity)
         
       #piu è vicino alla treshold piu pacchetti vengono scambiati
-        if signal_intensity > 3:
+      #cerca di randomizzare in base al segnale, altrimenti perdi pacchetti
+        if signal_intensity <140:
             print("Messages exchanged")
             while node.packets_generated.qsize()!=0:
                 self.packets_received.put(node.packets_generated.get())
-                
-            self.n_packet_received += self.packets_received.qsize()
+                self.n_packets_received += 1
             
         else:
             print("Messages not exchanged")
-            self.n_packet_not_received += 1
+            self.n_packets_not_received += 1
             
      #genera un numero di pacchetti random ad ogni passo      
     def generate_packets(self):
-        rate = random.randint(1,5)
+        
         i=0
-        while i<rate:
+        while i<self.rate:
             self.packets_generated.put("packet")
-            self.n_packet_generated +=1
+            self.n_packets_generated +=1
             i +=1
     
 

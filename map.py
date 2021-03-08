@@ -196,8 +196,9 @@ class Map:
 
         for n in range(number_of_nodes):
             #print(n)
-            speed = random.randint(20, 80)
-            node = Node(12,speed,coords=possible_positions[n].get_coordinates(), start=possible_positions[n].get_coordinates(), target=sample_left[n].get_coordinates())
+            speed = random.randint(50, 200)
+            transmission_time = round(random.uniform(0.1, 1.0), 1)
+            node = Node(transmission_time,speed,coords=possible_positions[n].get_coordinates(), start=possible_positions[n].get_coordinates(), target=sample_left[n].get_coordinates())
             node.set_path(self) # this functions calls the A* algorithm that decides the path upon which the node will move.
             nodes.append(node)
             self.topology[possible_positions[n].get_coordinates()[0]][possible_positions[n].get_coordinates()[1]].set_status(2)
@@ -215,9 +216,9 @@ class Map:
                 if self.topology[i][j].get_status() == 1:
                     road_spaces = road_spaces + 1
                     if i!=0 and j!=0:
-                        available_spaces.append(self.topology[i][j])    # i don't want to place nodes in the sink
+                        available_spaces.append(self.topology[i][j])    
         
-        number_of_sinks =  10    # looks like a resonable number of nodes in such a map
+        number_of_sinks =  5   
         print(f"NUMBER OF SINKS = {number_of_sinks}")
         
         sinks = []
@@ -227,11 +228,10 @@ class Map:
         
 
         for n in range(number_of_sinks):
-            #print(n)
+           
             sink = Sink(coords=possible_positions[n].get_coordinates())
-            # this functions calls the A* algorithm that decides the path upon which the node will move.
             sinks.append(sink)
             self.topology[possible_positions[n].get_coordinates()[0]][possible_positions[n].get_coordinates()[1]].set_status(3)
-            #print(str(nodes[n].get_position()))
+        
 
         return sinks
