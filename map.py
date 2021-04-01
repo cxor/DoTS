@@ -42,7 +42,7 @@ class Map:
                         print(".", sep=" ", end="")
                     if self.topology[col][row].get_status() == 3:
                         # print("\u25cf", sep=" ", end="")
-                        # print("\u2022", sep=" ", end="")    # road
+                        # print("\u2022", sep=" ", end="")    # sink
                         print("S", sep=" ", end="")
                     else:
                         # print("\u25cb", sep=" ", end="")
@@ -179,10 +179,11 @@ class Map:
             for j in range(columns_no):
                 if self.topology[i][j].get_status() == 1:
                     road_spaces = road_spaces + 1
-                    if i!=0 and j!=0:
-                        available_spaces.append(self.topology[i][j])    # i don't want to place nodes in the sink
+                    available_spaces.append(self.topology[i][j])
+                    # if i!=0 and j!=0:
+                    #     available_spaces.append(self.topology[i][j])    # i don't want to place nodes in the sink
         
-        number_of_nodes = road_spaces // 12     # looks like a resonable number of nodes in such a map
+        number_of_nodes = road_spaces // 9     # looks like a resonable number of nodes in such a map
         print(f"NUMBER OF NODES = {number_of_nodes}")
         # nodes = np.full(shape=number_of_nodes, fill_value=Node())
         nodes = []
@@ -196,9 +197,10 @@ class Map:
 
         for n in range(number_of_nodes):
             #print(n)
-            speed = random.randint(50, 200)
+            # speed = random.randint(50, 200)
+            speed = random.randint(30, 150)
             transmission_time = round(random.uniform(0.1, 1.0), 1)
-            node = Node(transmission_time,speed,coords=possible_positions[n].get_coordinates(), start=possible_positions[n].get_coordinates(), target=sample_left[n].get_coordinates())
+            node = Node(n,transmission_time,speed,coords=possible_positions[n].get_coordinates(), start=possible_positions[n].get_coordinates(), target=sample_left[n].get_coordinates())
             node.set_path(self) # this functions calls the A* algorithm that decides the path upon which the node will move.
             nodes.append(node)
             self.topology[possible_positions[n].get_coordinates()[0]][possible_positions[n].get_coordinates()[1]].set_status(2)
@@ -218,7 +220,7 @@ class Map:
                     if i!=0 and j!=0:
                         available_spaces.append(self.topology[i][j])    
         
-        number_of_sinks =  5   
+        number_of_sinks =  road_spaces // 24   
         print(f"NUMBER OF SINKS = {number_of_sinks}")
         
         sinks = []

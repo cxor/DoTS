@@ -5,7 +5,8 @@ import random
 
 class Node:
 
-    def __init__(self, transmission_time=0, speed=0, coords=[-1,-1], start=[-1,-1], target=[-1,-1], par=None):
+    def __init__(self, id_number=1000, transmission_time=0, speed=0, coords=[-1,-1], start=[-1,-1], target=[-1,-1], par=None):
+        self.id = id_number
         self.position = Waypoint(coordinates=coords)
         self.start = Waypoint(coordinates=start)
         self.target = Waypoint(coordinates=target)
@@ -24,6 +25,9 @@ class Node:
         self.n_packets_not_sent = 0
         self.packets_generated = queue.Queue()
         self.packets_received = queue.Queue()
+
+    def get_id(self):
+        return self.id
         
     def get_transmission_time(self):
         return self.transmission_time
@@ -146,32 +150,39 @@ class Node:
     
     def exchange_message(self, node):
         
+        print(f"Node {self.get_id()} is trying to exchange packets with node {node.get_id()} in area {self.get_position()}")
+        print("This node has speed: ", self.get_speed())
+        print("This node has TX time: ", self.get_transmission_time())
         #check the probability of exchange messages
         speed_node_b = node.get_speed()
         transmission_b = node.get_transmission_time()
         speed_node_a = self.get_speed()
         transmission_a = self.get_transmission_time()
         signal_intensity = abs(speed_node_b + speed_node_a)*(transmission_b + transmission_a)
-        print(signal_intensity)
+        print("Therefore the signal intensity is: ", signal_intensity)
         
       #piu è vicino alla treshold piu pacchetti vengono scambiati
       #cerca di randomizzare in base al segnale, altrimenti perdi pacchetti
-        if signal_intensity <140:
+        if signal_intensity < 185:
             print("Messages exchanged")
             while node.packets_generated.qsize()!=0:
                 self.packets_received.put(node.packets_generated.get())
                 self.n_packets_received += 1
+            # print(self.packets_received.queue)
             
         else:
             print("Messages not exchanged")
             self.n_packets_not_received += 1
             
-     #genera un numero di pacchetti random ad ogni passo      
+    
+    
+    #genera un numero di pacchetti random ad ogni passo      
     def generate_packets(self):
         
         i=0
         while i<self.rate:
-            self.packets_generated.put("packet")
+            p = 'pkt_' + str(self.get_id())
+            self.packets_generated.put(p)
             self.n_packets_generated +=1
             i +=1
     
