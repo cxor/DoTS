@@ -4,12 +4,30 @@ from node import Node
 
 class Sink:
     
-    def __init__(self, coords=[-1,-1]):
+    def __init__(self, id=99, coords=[-1,-1], active=True):
+        self.id = id
         self.position = Waypoint(coordinates=coords)
         self.n_packets_received = 0
         self.n_packets_not_received = 0
-        self.packets_received = queue.Queue(100)
+        self.packets_received = queue.Queue(350)
+        self.active = active
         
+    
+    def get_id(self):
+        return self.id
+    
+    def set_id(self, i):
+        self.id = i
+        return None
+    
+    def set_active(self, ac):
+        self.active = ac
+        return None
+
+    def get_active(self):
+        return self.active
+
+
     def get_position(self):
         return self.position.get_coordinates()
     

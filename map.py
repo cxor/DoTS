@@ -54,23 +54,33 @@ class Map:
 
     def draw_with_nodes(self):
         if self.topology is not None:
+            img = []
             for col in range(self.size[1]):
+                r = []
                 for row in range(self.size[0]):
                     if self.topology[col][row].get_status() == 1:
                         # print("\u25cf", sep=" ", end="")
                         # print("\u2022", sep=" ", end="")    # road
                         print(".", sep=" ", end="")
+                        r.append(10)
                     elif self.topology[col][row].get_status() == 0:
                         print("0", sep=" ", end="")
+                        r.append(1)
                     elif self.topology[col][row].get_status() == 3:
                         print("S", sep=" ", end="")
+                        r.append(100)
+                    elif self.topology[col][row].get_status() == 5:
+                        print("D", sep=" ", end="")
+                        r.append(32)
                     else:
                         # print("\u25cb", sep=" ", end="")
                         # print("\u0394", sep=" ", end="")    # obstacle
                         print("N", sep=" ", end="")
+                        r.append(50)
                     if row == (self.size[0] - 1):
                         print()
-        return None
+                img.append(r)
+        return np.array(img)
 
     def get_size(self):
         return self.size
@@ -170,7 +180,7 @@ class Map:
         return waypoint_matrix
 
 
-    def add_nodes(self):
+    def add_nodes(self, sinks):
         columns_no = self.size[0]
         rows_no = self.size[1]
         road_spaces = 0
@@ -183,7 +193,7 @@ class Map:
                     # if i!=0 and j!=0:
                     #     available_spaces.append(self.topology[i][j])    # i don't want to place nodes in the sink
         
-        number_of_nodes = road_spaces // 9     # looks like a resonable number of nodes in such a map
+        number_of_nodes = road_spaces // 7     # looks like a resonable number of nodes in such a map
         print(f"NUMBER OF NODES = {number_of_nodes}")
         # nodes = np.full(shape=number_of_nodes, fill_value=Node())
         nodes = []
@@ -195,12 +205,32 @@ class Map:
         pos_left = [x for x in available_spaces if x not in possible_positions] # I'm sure they're more than the number of nodes, no need for checks
         sample_left = random.sample(pos_left, number_of_nodes)
 
+        list_of_sinks = []
+        for s in range(len(sinks)):
+            list_of_sinks.append(s)
+
         for n in range(number_of_nodes):
+            strt = possible_positions[n].get_coordinates()
+            if (n%3==0):
+                s, t = random.sample(list_of_sinks, 2)
+                trgt = sinks[t].get_position()
+                strt = sinks[s].get_position()
+                # trgt = sinks[1].get_position()
+                # strt = sinks[0].get_position()
+            elif (n%4==0):
+                s, t = random.sample(list_of_sinks, 2)
+                trgt = sinks[t].get_position()
+                strt = sinks[s].get_position()
+            elif (n%5==0):
+                trgt = sinks[0].get_position()
+                strt = sinks[-1].get_position()
+            else:
+                trgt = sample_left[n].get_coordinates()
             #print(n)
             # speed = random.randint(50, 200)
-            speed = random.randint(30, 150)
+            speed = random.randint(10, 90)
             transmission_time = round(random.uniform(0.1, 1.0), 1)
-            node = Node(n,transmission_time,speed,coords=possible_positions[n].get_coordinates(), start=possible_positions[n].get_coordinates(), target=sample_left[n].get_coordinates())
+            node = Node(n,transmission_time,speed,coords=possible_positions[n].get_coordinates(), start=strt, target=trgt)
             node.set_path(self) # this functions calls the A* algorithm that decides the path upon which the node will move.
             nodes.append(node)
             self.topology[possible_positions[n].get_coordinates()[0]][possible_positions[n].get_coordinates()[1]].set_status(2)
@@ -220,7 +250,7 @@ class Map:
                     if i!=0 and j!=0:
                         available_spaces.append(self.topology[i][j])    
         
-        number_of_sinks =  road_spaces // 24   
+        number_of_sinks = road_spaces // 24   
         print(f"NUMBER OF SINKS = {number_of_sinks}")
         
         sinks = []
@@ -231,7 +261,7 @@ class Map:
 
         for n in range(number_of_sinks):
            
-            sink = Sink(coords=possible_positions[n].get_coordinates())
+            sink = Sink(id=n, coords=possible_positions[n].get_coordinates())
             sinks.append(sink)
             self.topology[possible_positions[n].get_coordinates()[0]][possible_positions[n].get_coordinates()[1]].set_status(3)
         

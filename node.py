@@ -5,7 +5,7 @@ import random
 
 class Node:
 
-    def __init__(self, id_number=1000, transmission_time=0, speed=0, coords=[-1,-1], start=[-1,-1], target=[-1,-1], par=None):
+    def __init__(self, id_number=1000, transmission_time=0, speed=0, coords=[-1,-1], start=[-1,-1], target=[-1,-1], par=None, active=True):
         self.id = id_number
         self.position = Waypoint(coordinates=coords)
         self.start = Waypoint(coordinates=start)
@@ -25,6 +25,14 @@ class Node:
         self.n_packets_not_sent = 0
         self.packets_generated = queue.Queue()
         self.packets_received = queue.Queue()
+        self.active = active
+
+    def set_active(self, ac):
+        self.active = ac
+        return None
+
+    def get_active(self):
+        return self.active
 
     def get_id(self):
         return self.id
@@ -167,11 +175,12 @@ class Node:
             print("Messages exchanged")
             while node.packets_generated.qsize()!=0:
                 self.packets_received.put(node.packets_generated.get())
+                node.n_packets_sent += 1
                 self.n_packets_received += 1
-            # print(self.packets_received.queue)
-            
+            # print(self.packets_received.queue)  
         else:
             print("Messages not exchanged")
+            self.n_packets_not_sent += (self.packets_generated.qsize())
             self.n_packets_not_received += 1
             
     
