@@ -32,7 +32,7 @@ class Sink:
         return self.position.get_coordinates()
     
     def message_received(self, message):
-        self.queue.add(message)
+        self.packets_received.put(message)
         
     def message_exchange(self, node):
         print(f"Sink in position {self.get_position()} is trying to exchange packets with node {node.get_id()}")

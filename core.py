@@ -24,6 +24,21 @@ def prepare_map():
     return simulation_map, sinks, nodes
 
 
+def insinkarea(n, s, s_power=1):
+    lat_n = n.get_position()[0]
+    lat_s = s.get_position()[0]
+    lon_n = n.get_position()[1]
+    lon_s = s.get_position()[1]
+    lat_low = lat_s - s_power
+    lat_high = lat_s + s_power
+    lon_low = lon_s - s_power
+    lon_high = lon_s + s_power
+    if(lat_low <= lat_n <= lat_high):
+        if(lon_low <= lon_n <= lon_high):
+            return True
+    return False    
+
+
 def execute_simulation(sim_map, param_sinks, param_nodes, crash_nodes = 0, disaster = False, n_sim=0):
     simulation_map = sim_map
     nodes = param_nodes
@@ -129,7 +144,8 @@ def execute_simulation(sim_map, param_sinks, param_nodes, crash_nodes = 0, disas
                 
         for node in nodes:
             for sink in sinks:
-                if (node.get_position() == sink.get_position() and node.get_active()):
+                #if (node.get_position() == sink.get_position() and node.get_active()):
+                if (insinkarea(node, sink) and node.get_active()):
                     sink.message_exchange(node)
                     print("Sink and node on the same position")
                     tmp_traffic_sinks += sink.n_packets_received
@@ -278,7 +294,7 @@ def main():
     sim_num = range(len(n_nodes))
     fig = plt.figure(figsize=(17,10))
     axs = fig.subplots(2, 2)
-    fig.suptitle('Total data from ' + sim_groups*3 + ' simulations')
+    fig.suptitle('Total data from ' + str(sim_groups*3) + ' simulations')
     axs[0, 0].scatter(sim_num, avg_node_gen_packet, marker='o')
     axs[0, 0].set_title('Average pkts generation rate of nodes')
     axs[0, 1].scatter(sim_num, total_nodes_packets_transferred, marker='o', c='green')
