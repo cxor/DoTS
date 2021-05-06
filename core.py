@@ -14,7 +14,6 @@ def prepare_map():
     nodes = []
     sinks = []
     
-    #while len(nodes) < 11 and len(sinks) < 3:       # Voglio una mappa significativa, no?
     while len(nodes) < 11 and len(sinks)<3:       # Voglio una mappa significativa, no?
         while len(sinks) < 3:
             simulation_map = Map(topology="roads", size=[20,10])
@@ -302,6 +301,12 @@ def main():
     plt.show()
     '''
 
+def simulation_init():
+    # This method will be renamed "main" as will take its place as soon as
+    # the entire codebase will be a little bit refactored for readability
+    # reasons.
+   pass
+    
 
 if __name__ == "__main__":
-    main()
+    simulation_init()

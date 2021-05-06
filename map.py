@@ -6,9 +6,7 @@ from sink import Sink
 
 class Map:
 
-    # WAYPOINT_ACTIVATION_STOC_V = [0.95, 0.50, 0.25, 0.15]
     WAYPOINT_ACTIVATION_STOC_V = [0.95, 0.60, 0.45, 0.25]
-    # WAYPOINT_ACTIVATION_STOC_V = [0.8]
 
     # Map object is defined by:
     #   - topology [blank, roads]

@@ -2,7 +2,6 @@ from waypoint import Waypoint
 import queue
 import random
 
-
 class Node:
 
     def __init__(self, id_number=1000, transmission_time=0, speed=0, coords=[-1,-1], start=[-1,-1], target=[-1,-1], par=None, active=True):
@@ -108,9 +107,8 @@ class Node:
         open.append(start_node)
 
         while len(open)>0:
-
+            # Set the starting node as the initial and final waypoint of a path
             current_node = open.pop(0)
-
             closed.append(current_node)
 
             if current_node.get_position() == goal_node.get_position():
@@ -126,16 +124,11 @@ class Node:
             # neighbors = [[x-1,y],[x,y+1],[x+1,y],[x,y-1]]     # WITHOUT DIAGONALS
 
             for next in neighbors:
-
-                if(next[0]>9):
-                    continue
-                if(next[1]>19):
-                    continue
-                if(next[0]<0):
-                    continue
-                if(next[1]<0):
-                    continue
-
+                if (next[0] > 9) or (next[0] < 0) or (next[1] > 19) or (next[1] < 0):
+                    continue 
+                # it is not clear to what we are referring from:
+                #   topology[x][y] --> waypoint
+                #   topology.topology --> are we accessing a class attribute directly? Why are we not using the get_topology method?
                 map_value = topology.topology[next[0]][next[1]].get_status()
  
                 if(map_value == 0):
