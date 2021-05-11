@@ -5,7 +5,7 @@ import random
 class Node:
 
     def __init__(self, id_number=1000, transmission_time=0, speed=0, coords=[-1,-1], start=[-1,-1], target=[-1,-1], par=None, active=True):
-        self.id = id_number
+        self.id = "node_" + str(id_number)
         self.position = Waypoint(coordinates=coords)
         self.start = Waypoint(coordinates=start)
         self.target = Waypoint(coordinates=target)

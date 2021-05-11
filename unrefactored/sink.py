@@ -3,8 +3,9 @@ from queue import Queue
 from node import Node
 
 class Sink:
-    
-    def __init__(self, id=0, coordinates=[-1,-1], status=True, memory=100, log=True):
+    log = True 
+
+    def __init__(self, id=0, coordinates=[-1,-1], status=True, memory=100):
         self.id = id
         self.position = Waypoint(coordinates=coordinates)
         self.n_packets_received = 0

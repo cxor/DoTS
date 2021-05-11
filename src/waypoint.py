@@ -16,7 +16,7 @@ class Waypoint:
         #   "node" -> a node is present on the waypoint
         #   "sink" -> a sink is present on the waypoint
         #   "obstacle" -> an obstacle is present on the waypoint
-
+    
     def set_coordinates(self, coordinates):
         self.coordinates = coordinates
 
@@ -34,7 +34,7 @@ class Waypoint:
 
     def get_status(self):
         return self.status
-    
+
     def set_entity(self, entity):
         self.entity = entity
 
