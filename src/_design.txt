@@ -1,4 +1,5 @@
-class Simulation
+class Simulator
+class Message
 class Navigator
 class Map
 class Waypoint

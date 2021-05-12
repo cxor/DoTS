@@ -14,4 +14,4 @@ def message_exchange():
 
 def map_print():
     map = Map(size=[5,5])
-    map.print() 
+    map.print()
