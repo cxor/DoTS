@@ -13,6 +13,7 @@ class Node:
         self.status = 1
         self.signal = signal
         self.navigator = navigator
+        self.fault = fault
         self.speed = round(numpy.random.uniform(speed/2, speed), 1)
         self.buffer = Queue(mem_capacity)
         self.no_info_message_received = 0
@@ -43,6 +44,9 @@ class Node:
 
     def set_buffer(self, buffer):
         self.buffer = buffer
+
+    def get_navigator(self):
+        return self.navigator
 
     def get_signal(self):
         return self.trx_power
@@ -97,6 +101,7 @@ class Node:
         # it might be fair to point out that this seems to be the
         # default behaviour in many signalling networks (e.g. SS7,
         # WiFi, ZigBee, Bluetooth, and others).
+        # NOTE: it is possible to directly skip some message sends
         message = Message(sender_id=self.id, receiver_id=receiver.get_id(), \
             message_type=message_type)
         sensitivity = self.get_signal_sensitivity(receiver)

@@ -12,7 +12,6 @@ class Map:
 
     def __init__(self, size=[100,100]):
         self.size = size
-        self.scale = scale
         self.nodes = []
         self.sinks = []
         self.network = self.generate_network(size)
@@ -29,9 +28,11 @@ class Map:
     def get_sinks(self):
         return self.sinks
 
-    def build(self, no_nodes, no_sinks, node_signal, sink_signal, node_speed, fault):
+    def build(self, no_nodes, no_sinks, node_signal, sink_signal,
+              node_speed, fault, transmission_rate):
         self.add_sinks(self, no_sinks, sink_signal, fault)
-        self.add_nodes(self, no_nodes, node_signal, node_speed, fault)
+        self.add_nodes(self, no_nodes, node_signal, 
+                       node_speed, fault, transmission_rate)
 
     def generate_network(self, size):
         # The following method designs a waypoint network for the map.
@@ -90,27 +91,44 @@ class Map:
     
     def add_sinks(self, no_sinks, sink_signal, sink_fault):
         available_positions = self.get_available_positions()
+        # NOTE: check whether the available positions are more than the
+        # requested ones from sinks + nodes
+        if len(available_positions) <= no_sinks:
+            no_sinks = int(len(available_positions) / 2)
+            if Map.LOG:
+                print("Warning: the number of sinks requested is too high for the size of the map")
+                print(f"Running simulation with {no_sinks} sinks")
         sink_locations = random.sample(available_positions, no_sinks)
         for i in range(no_sinks):
             current_waypoint = sink_locations[i]
             sink = Sink(id=i, coordinates=current_waypoint.get_coordinates(), \
                 signal=sink_signal, fault=sink_fault)
             self.sinks.append(sink)
+            # TODO: remove entity?
             current_waypoint.set_entity("sink") 
 
-    def add_nodes(self, no_nodes, node_signal, node_speed, node_fault):
-        available_starts = self.get_available_positions()
-        available_targets = self.get_available_positions()
-        node_locations = random.sample(available_starts, no_nodes)
-        node_targets = random.sample(available_targets, no_nodes)
-        for i in range (no_nodes):
+    def add_nodes(self, no_nodes, node_signal, node_speed, 
+                  node_fault, transmission_rate):
+        available_positions = self.get_available_positions()
+        # NOTE: check whether the available positions are more than the
+        # requested ones from sinks + nodes
+        if len(available_positions):
+            no_nodes = int(len(available_positions) / 2)
+            if Map.LOG:
+                print("Warning: the number of nodes requested is too high for the size of the map")
+                print(f"Running simulation with {no_nodes} nodes")
+        node_locations = random.sample(available_positions, no_nodes)
+        node_targets = random.sample(available_positions, no_nodes)
+        for i in range(no_nodes):
             start_waypoint = node_locations[i]
             target_waypoint = node_targets[i]
             navigator = Navigator(start=start_waypoint, \
                 target=target_waypoint, network=self.network)
             node = Node(id=i, signal=node_signal, speed=node_speed, \
-                    navigator=navigator, fault=node_fault)
+                    navigator=navigator, fault=node_fault, \
+                    transmission_rate=transmission_rate)
             self.nodes.append(node)
+            # TODO: remove entity?
             start_waypoint.set_entity("node")
 
     def get_available_positions(self):
@@ -127,7 +145,11 @@ class Map:
     def update(self, disaster):
         # TODO: implement here the code to trigger node movement, 
         # message exchange, random fault and random disasters
-        if disaster == True:
+        if disaster:
+            # 1. randomically select an area to apply the disaster into
+            # 2. set the status of every entity in the area above to 0
+            # 3.
+
             pass
         else:
             pass 

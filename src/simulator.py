@@ -27,17 +27,29 @@ class Simulator:
         self.map_size = map_size / self.map_scale
         self.stats = numpy.array([0, 0, 0, 0])
 
-    def run(self, epochs=10):
+    def run(self, seconds=10):
         # TODO: load the parameters to build the maps
         map = Map(size=self.map_size)
         map.build(self.no_nodes, self.no_sinks, self.node_signal, \
            self.sink_signal, self.fault, self.transmission_rate)
+        epochs = seconds * self.transmission_rate
+        disaster_epochs = epochs / 10
+        disaster_counter = disaster_epochs
+        disaster = False
 
         for i in range(epochs):
-            disaster = False
-            disaster_chance = numpy.random.uniform(0,1)
-            if disaster_chance <= self.disaster:
+            if disaster:
+                if disaster_counter > 0:
+                    disaster_chance = 1 
+                else:
+                    disaster = False
+                    disaster_counter = disaster_epochs
+                    disaster_chance = numpy.random.uniform(0,1)
+            else:
+                disaster_chance = numpy.random.uniform(0,1)
+            if disaster_chance >= 1 - self.disaster:
                 disaster = True
+                disaster_counter -= 1
             map.update(disaster=disaster)
             
     def plot(self):

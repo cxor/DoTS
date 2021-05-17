@@ -13,9 +13,7 @@ class Waypoint:
         self.entity = entity
         # Waypoint entity legend:
         #   "empty" -> no network entity is present on the waypoint
-        #   "node" -> a node is present on the waypoint
-        #   "sink" -> a sink is present on the waypoint
-        #   "obstacle" -> an obstacle is present on the waypoint
+        #   "entity" -> a node or a sink is present on the waypoint
     
     def set_coordinates(self, coordinates):
         self.coordinates = coordinates

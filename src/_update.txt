@@ -1,0 +1,11 @@
+Generic Map Update
+
+for node in nodes:
+    if fault:
+        node.move()
+        node.send_message(message=message, sensitivity=0)
+    if disaster:
+        # disaster_epochs = epochs / 10 
+        # node.move() !
+        fault = random.uniform(0.5, 1 - fault)
+        now check if the entity survives to fault
