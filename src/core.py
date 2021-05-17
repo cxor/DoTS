@@ -11,6 +11,7 @@ def launch_batch_simulations():
     fault = [0.1, 0.3, 0.4]
     disaster = [0, 0.1, 0.2]
     map_size = [100, 100]
+    map_scale = 2
     simulation_epochs = 20 
     # -----------------------------------
     for i in range(no_batch_simulations):
@@ -22,7 +23,8 @@ def launch_batch_simulations():
             node_speed=node_speed[i],   \
             fault=fault[i],             \
             disaster=disaster[i],       \
-            map_size=map_size)
+            map_size=map_size,          \
+            map_scale=map_scale)
         simulator.run(epochs=simulation_epochs)
         simulator.plot()
 

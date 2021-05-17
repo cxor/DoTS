@@ -12,6 +12,7 @@ class Map:
 
     def __init__(self, size=[100,100]):
         self.size = size
+        self.scale = scale
         self.nodes = []
         self.sinks = []
         self.network = self.generate_network(size)

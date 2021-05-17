@@ -63,6 +63,7 @@ class Node:
         # not full and 2. the interference does not significantly
         # clog the communication channel.
         interference = round(numpy.random.uniform(0,1), 2)
+        # TODO: parametrized obstacle rnadom draw
         if Node.LOG:
             print(f"[{self.id}] ", end="")
             if not (self.buffer.full()) and \
