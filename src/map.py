@@ -7,14 +7,14 @@ import random
 
 class Map:
 
-    WAYPOINT_ACTIVATIONS = [0.15, 0.60, 0.45, 0.25]
+    WAYPOINT_ACTIVATIONS = [0.95, 0.60, 0.45, 0.25]
     LOG = True
 
     def __init__(self, size=[100,100]):
         self.size = size
         self.nodes = []
         self.sinks = []
-        self.network = self.generate_network(size)
+        self.network = []
         
     def get_network(self):
         return self.network
@@ -30,8 +30,13 @@ class Map:
 
     def build(self, no_nodes, no_sinks, node_signal, sink_signal,
               node_speed, fault, transmission_rate):
-        self.add_sinks(self, no_sinks, sink_signal, fault)
-        self.add_nodes(self, no_nodes, node_signal, 
+        # Create a map inline with desired specifications
+        no_available_positions = 0
+        while no_available_positions < (no_nodes + no_sinks):
+            self.network = self.generate_network(self.size)
+            no_available_positions = len(self.get_available_positions())
+        self.add_sinks(no_sinks, sink_signal, fault)
+        self.add_nodes(no_nodes, node_signal, 
                        node_speed, fault, transmission_rate)
 
     def generate_network(self, size):
@@ -87,17 +92,11 @@ class Map:
                         current_waypoint.add_neighbor(neighbor_waypoint)
                         neighbor_waypoint.add_neighbor(current_waypoint)
                         neighbor_waypoint.set_status(1)
+
         return waypoint_matrix
     
     def add_sinks(self, no_sinks, sink_signal, sink_fault):
         available_positions = self.get_available_positions()
-        # NOTE: check whether the available positions are more than the
-        # requested ones from sinks + nodes
-        if len(available_positions) <= no_sinks:
-            no_sinks = int(len(available_positions) / 2)
-            if Map.LOG:
-                print("Warning: the number of sinks requested is too high for the size of the map")
-                print(f"Running simulation with {no_sinks} sinks")
         sink_locations = random.sample(available_positions, no_sinks)
         for i in range(no_sinks):
             current_waypoint = sink_locations[i]
@@ -110,13 +109,6 @@ class Map:
     def add_nodes(self, no_nodes, node_signal, node_speed, 
                   node_fault, transmission_rate):
         available_positions = self.get_available_positions()
-        # NOTE: check whether the available positions are more than the
-        # requested ones from sinks + nodes
-        if len(available_positions):
-            no_nodes = int(len(available_positions) / 2)
-            if Map.LOG:
-                print("Warning: the number of nodes requested is too high for the size of the map")
-                print(f"Running simulation with {no_nodes} nodes")
         node_locations = random.sample(available_positions, no_nodes)
         node_targets = random.sample(available_positions, no_nodes)
         for i in range(no_nodes):

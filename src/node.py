@@ -8,12 +8,14 @@ class Node:
     LOG = True
     
     def __init__(self, id=0, signal=0, speed=0, \
-        mem_capacity=100, navigator=None, fault=0):
+        mem_capacity=100, navigator=None, fault=0,\
+        transmission_rate=10):
         self.id = "node_" + str(id)
         self.status = 1
         self.signal = signal
         self.navigator = navigator
         self.fault = fault
+        # TODO: define how to describe the node speed
         self.speed = round(numpy.random.uniform(speed/2, speed), 1)
         self.buffer = Queue(mem_capacity)
         self.no_info_message_received = 0
