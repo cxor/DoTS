@@ -52,16 +52,23 @@ class Navigator:
                     comparable_neighbor = ComparableWaypoint(neighbor_trajectory_cost, neighbor)
                     exploration_heap.put(comparable_neighbor)
                     for viable_waypoint in exploration_heap.queue:
+                        print('arriva qui 1')
                         # Get the waypoint attribute in ComparableWaypoint dataclass
                         waypoint = viable_waypoint.waypoint
                         waypoint_trajectory_cost, waypoint_route_cost = self.get_trajectory_cost(waypoint)
                         for item in exploration_heap.queue:
+                            print('arriva qui 2')
+                            print(str(len(exploration_heap.queue)))
                             if (comparable_neighbor.waypoint.get_coordinates() == item.waypoint.get_coordinates()):
-                                pass
+                                print('arriva qui 3')
+                                continue
                             elif (neighbor_route_cost <= waypoint_route_cost):
+                                print(neighbor.get_coordinates())
+                                print('arriva qui 4')
                                 route.append(neighbor)
                                 
                 else:
+                    print('entra qui')
                     continue        # continue to beginning of for loop
         return None
 

@@ -89,7 +89,7 @@ class Map:
                     activation_seed = round(numpy.random.uniform(0,1), 2)
                     activation_threshold = numpy.random.choice(Map.WAYPOINT_ACTIVATIONS)
                     if activation_seed <= activation_threshold:
-                        current_waypoint.add_neighbor(neighbor_waypoint)
+                        #current_waypoint.add_neighbor(neighbor_waypoint)
                         neighbor_waypoint.add_neighbor(current_waypoint)
                         neighbor_waypoint.set_status(1)
 
