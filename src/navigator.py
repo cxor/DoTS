@@ -32,44 +32,55 @@ class Navigator:
             is reached or there are no more states
         """
         exploration_heap = PriorityQueue()
-        current_waypoint = self.start       # let openList equal empty list of nodes // put startNode on the openList (leave it's f at zero)
-        closed_frontier, route = [], []     # let closedList equal empty list of nodes
+        current_waypoint = self.start      
+        closed_frontier, route, parents = [], [], {}
         
         comparable_waypoint = \
             ComparableWaypoint(self.get_trajectory_cost(self.start), self.start)
         exploration_heap.put(comparable_waypoint)
         route.append(self.start)
-        print(self.start.get_coordinates())
-        while not exploration_heap.empty():     # while openList is not empty
-            current_waypoint = exploration_heap.get().waypoint  # let currentNode equal the node with the least f value // remove currentNode from the openList
-            if current_waypoint == self.target:     # if currentNode is the goal
-                return [ waypoint.get_coordinates() for waypoint in route ]     # You've found the exit!
-            closed_frontier.append(current_waypoint)    # add currentNode to the closedList
-            for neighbor in current_waypoint.get_neighbors():       # for each child in the children
-                if neighbor not in closed_frontier:     # if child is not in the closedList
+        while not exploration_heap.empty():   
+            current_waypoint = exploration_heap.get().waypoint  
+            if current_waypoint == self.target:
+                # PROVA
+                path = []
+                back = False
+                dest_waypoint = str(self.target.get_coordinates())
+                while not back:
+                    par_waypoint = parents[dest_waypoint]
+                    path.append(dest_waypoint)
+                    dest_waypoint = str(par_waypoint.get_coordinates())
+                    if(par_waypoint == self.start):
+                        path.append(str(self.start.get_coordinates()))
+                        back = True
+                        break
+                print(self.start.get_coordinates())
+                print(self.target.get_coordinates())
+                print('path')
+                path.reverse()
+                print(path)
+                return path
+                # FINE PROVA
+                return [ waypoint.get_coordinates() for waypoint in route ] 
+            closed_frontier.append(current_waypoint) 
+            for neighbor in current_waypoint.neighbors:
+                if not neighbor in closed_frontier:
+                    parents[str(neighbor.get_coordinates())] = current_waypoint
                     neighbor_trajectory_cost, neighbor_route_cost = \
-                        self.get_trajectory_cost(neighbor)        # child.g, child.h, child.f
+                        self.get_trajectory_cost(neighbor)
                     comparable_neighbor = ComparableWaypoint(neighbor_trajectory_cost, neighbor)
                     exploration_heap.put(comparable_neighbor)
                     for viable_waypoint in exploration_heap.queue:
-                        print('arriva qui 1')
-                        # Get the waypoint attribute in ComparableWaypoint dataclass
                         waypoint = viable_waypoint.waypoint
                         waypoint_trajectory_cost, waypoint_route_cost = self.get_trajectory_cost(waypoint)
-                        for item in exploration_heap.queue:
-                            print('arriva qui 2')
-                            print(str(len(exploration_heap.queue)))
-                            if (comparable_neighbor.waypoint.get_coordinates() == item.waypoint.get_coordinates()):
-                                print('arriva qui 3')
-                                continue
-                            elif (neighbor_route_cost <= waypoint_route_cost):
-                                print(neighbor.get_coordinates())
-                                print('arriva qui 4')
+                        if (comparable_neighbor.waypoint.get_coordinates() == waypoint.get_coordinates()):
+                            continue
+                        elif (neighbor_route_cost <= waypoint_route_cost):
+                            if not neighbor in route:
+                                parents[str(neighbor.get_coordinates())] = current_waypoint
                                 route.append(neighbor)
-                                
                 else:
-                    print('entra qui')
-                    continue        # continue to beginning of for loop
+                    continue 
         return None
 
     def get_trajectory_cost(self, waypoint):

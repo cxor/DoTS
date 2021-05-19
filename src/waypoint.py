@@ -2,9 +2,9 @@ class Waypoint:
     
     LOG = True
     
-    def __init__(self, coordinates=[-1,-1], neighbors=[], status=0, entity="empty"):
+    def __init__(self, coordinates=[-1,-1], status=0, entity="empty"):
         self.coordinates = coordinates
-        self.neighbors = neighbors
+        self.neighbors = []
         self.status = status    
         # Waypoint status legend:
         #   0 -> inactive waypoint
@@ -26,7 +26,7 @@ class Waypoint:
 
     def add_neighbor(self, neighbor):
         self.neighbors.append(neighbor)
-
+    
     def set_status(self, status):
         self.status = status
 

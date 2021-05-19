@@ -29,8 +29,7 @@ def launch_batch_simulations():
         simulator.plot()
 
 def main():
-    test.find_route()
-    
+   test.find_route() 
 
 if __name__ == "__main__":
     main()
