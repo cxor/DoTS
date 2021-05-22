@@ -2,7 +2,7 @@ class Waypoint:
     
     LOG = True
     
-    def __init__(self, coordinates=[-1,-1], status=0, entity="empty"):
+    def __init__(self, coordinates, status=0, entity="empty"):
         self.coordinates = coordinates
         self.neighbors = []
         self.status = status    

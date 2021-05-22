@@ -9,4 +9,7 @@ for node in nodes:
         # node.move() !
         fault = random.uniform(0.5, 1 - fault)
         now check if the entity survives to fault
+        
+
+        
     

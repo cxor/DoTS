@@ -42,26 +42,19 @@ class Navigator:
         while not exploration_heap.empty():   
             current_waypoint = exploration_heap.get().waypoint  
             if current_waypoint == self.target:
-                # PROVA
-                path = []
-                back = False
-                dest_waypoint = str(self.target.get_coordinates())
-                while not back:
-                    par_waypoint = parents[dest_waypoint]
-                    path.append(dest_waypoint)
-                    dest_waypoint = str(par_waypoint.get_coordinates())
+                optimal_route = []
+                backtrack = False
+                dest_waypoint = self.target.get_coordinates()
+                while not backtrack:
+                    par_waypoint = parents[str(dest_waypoint)]
+                    optimal_route.append(dest_waypoint)
+                    dest_waypoint = par_waypoint.get_coordinates()
                     if(par_waypoint == self.start):
-                        path.append(str(self.start.get_coordinates()))
-                        back = True
+                        optimal_route.append(self.start.get_coordinates())
+                        backtrack = True
                         break
-                print(self.start.get_coordinates())
-                print(self.target.get_coordinates())
-                print('path')
-                path.reverse()
-                print(path)
-                return path
-                # FINE PROVA
-                return [ waypoint.get_coordinates() for waypoint in route ] 
+                optimal_route.reverse()
+                return optimal_route
             closed_frontier.append(current_waypoint) 
             for neighbor in current_waypoint.neighbors:
                 if not neighbor in closed_frontier:

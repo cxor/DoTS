@@ -26,15 +26,14 @@ def print_neighbors():
         print(n.get_coordinates())
 
 def find_route():
-    map = Map(size=[20,20])
-    map.build(no_nodes=1, no_sinks=10, node_signal=10,
+    map = Map(size=[50,50])
+    map.build(no_nodes=10, no_sinks=10, node_signal=10,
               sink_signal=15, node_speed=10, fault=0, transmission_rate=1)
     map.print()
     nodes = map.get_nodes()
     for node in nodes:
         navigator = node.get_navigator()
-        print(navigator.get_route())
-        print(len(navigator.get_route()))
+        print(f"Node {node.get_id()} route: {navigator.get_route()}")
     
     
         # Insert the starting waypoint coordinates into the route
