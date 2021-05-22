@@ -73,7 +73,7 @@ class Node:
         if Node.LOG:
             print(f"[{self.id}] ", end="")
             if not (self.buffer.full()) and \
-                sensitivity < interference:
+                sensitivity > interference:
                 if message.get_type() == "info":
                     self.no_info_message_received += 1
                 elif message.get_type() == "sos":
@@ -92,8 +92,18 @@ class Node:
                     message from {message.get_sender_id()}")
                     
     def get_signal_sensitivity(self, receiver):
-        # TODO: implement here the sensitivity metrics
-        pass
+        distance = self.get_distance(receiver)
+        signal_sensitivity = numpy.e ** (-1 * distance / self.signal)
+        return signal_sensitivity
+
+    def get_distance(self, entity):
+        x_position = self.get_position()[0]
+        y_position = self.get_position()[1]
+        x_entity_position = self.get_position()[0]
+        y_entity_position = self.get_position()[1]
+        distance = abs(x_position - x_entity_position) \
+                   + abs(y_position - y_entity_position)
+        return distance
 
     def send_message(self, receiver, message_type):
         # NOTE: a node attempts to transmit a message whenever
@@ -104,7 +114,17 @@ class Node:
         # default behaviour in many signalling networks (e.g. SS7,
         # WiFi, ZigBee, Bluetooth, and others).
         # NOTE: it is possible to directly skip some message sends
+        if self.id == receiver.get_id():
+            return None
         message = Message(sender_id=self.id, receiver_id=receiver.get_id(), \
             message_type=message_type)
         sensitivity = self.get_signal_sensitivity(receiver)
         receiver.receive_message(message=message, sensitivity=sensitivity)
+        return None
+
+    def move(self):
+        current_position = self.navigator.get_position()
+        next_position = self.navigator.get_next_position()
+        if Node.LOG:
+            print(f"Node {self.id} is moving from \
+            {current_position} to {next_position}")

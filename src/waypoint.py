@@ -2,8 +2,11 @@ class Waypoint:
     
     LOG = True
     
-    def __init__(self, coordinates, status=0, entity="empty"):
-        self.coordinates = coordinates
+    def __init__(self, coordinates=None, status=0, entity="empty"):
+        if coordinates is None:
+            coordinates = [-1,-1]
+        else:
+            self.coordinates = coordinates
         self.neighbors = []
         self.status = status    
         # Waypoint status legend:

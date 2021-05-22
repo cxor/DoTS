@@ -11,12 +11,13 @@ class ComparableWaypoint:
 class Navigator:
 
     def __init__(self, start=[0,0], target=[0,0], network=None):
-        self.position = start
+        self.position = 0
         self.start = start
         self.target = target
         # The network attribute is just the waypoint matrix of the map
         self.network = network
         self.route = self.find_route()
+        self.full_route = self.route + self.route[1:-1]
 
     def find_route(self):
         """
@@ -91,8 +92,12 @@ class Navigator:
 
 
     def get_position(self):
-        return self.position
+        return self.route[self.position%len(self.full_route)]
 
+    def get_next_position(self):
+        self.position += 1
+        return self.get_position()
+        
     def get_route(self):
         return self.route
     

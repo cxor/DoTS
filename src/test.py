@@ -17,18 +17,15 @@ def print_map():
     map.print()
     
 def print_neighbors():
-    map = Map(size=[15,10])
-    waypoint_matrix = map.generate_network(size=[5,5])
-    for i in range(15):
-        for j in range(10):
-            pass
-    for n in waypoint_matrix[2][2].get_neighbors():
-        print(n.get_coordinates())
+    map = Map(no_nodes=10, no_sinks=10, node_signal=10,
+              sink_signal=15, node_speed=10, fault=0, 
+              transmission_rate=1, size=[50,50])
+    waypoint_matrix = map.get_network()
 
 def find_route():
-    map = Map(size=[50,50])
-    map.build(no_nodes=10, no_sinks=10, node_signal=10,
-              sink_signal=15, node_speed=10, fault=0, transmission_rate=1)
+    map = Map(no_nodes=10, no_sinks=10, node_signal=10,
+              sink_signal=15, node_speed=10, fault=0, 
+              transmission_rate=1, size=[50,50])
     map.print()
     nodes = map.get_nodes()
     for node in nodes:

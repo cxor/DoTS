@@ -10,11 +10,18 @@ class Map:
     WAYPOINT_ACTIVATIONS = [0.95, 0.60, 0.45, 0.25]
     LOG = True
 
-    def __init__(self, size=[100,100]):
+    def __init__(self, no_nodes, no_sinks, 
+                 node_signal, sink_signal, node_speed, fault, 
+                 transmission_rate, size=[100,100]):
         self.size = size
-        self.nodes = []
-        self.sinks = []
-        self.network = []
+        self.nodes, self.sinks, self.network = [], [], []
+        no_available_positions = 0
+        while no_available_positions < (no_nodes + no_sinks):
+            self.network = self.generate_network(self.size)
+            no_available_positions = len(self.get_available_positions())
+        self.add_sinks(no_sinks, sink_signal, fault)
+        self.add_nodes(no_nodes, node_signal, 
+                       node_speed, fault, transmission_rate)
         
     def get_network(self):
         return self.network
@@ -27,17 +34,6 @@ class Map:
 
     def get_sinks(self):
         return self.sinks
-
-    def build(self, no_nodes, no_sinks, node_signal, sink_signal,
-              node_speed, fault, transmission_rate):
-        # Create a map inline with desired specifications
-        no_available_positions = 0
-        while no_available_positions < (no_nodes + no_sinks):
-            self.network = self.generate_network(self.size)
-            no_available_positions = len(self.get_available_positions())
-        self.add_sinks(no_sinks, sink_signal, fault)
-        self.add_nodes(no_nodes, node_signal, 
-                       node_speed, fault, transmission_rate)
 
     def generate_network(self, size):
         # The following method designs a waypoint network for the map.
@@ -134,17 +130,18 @@ class Map:
         return available_positions
 
     def update(self, disaster):
-        # TODO: implement here the code to trigger node movement, 
-        # message exchange, random fault and random disasters
-        if disaster:
-            # 1. randomically select an area to apply the disaster into
-            # 2. set the status of every entity in the area above to 0
-            # 3.
-
-            pass
-        else:
-            pass 
-        
+        for node in self.nodes:
+            if disaster:
+                if not node.fault(disaster):
+                    # the node does not move along
+                    for receiver in self.nodes:
+                        node.send_message(receiver, "sos")
+            elif node.fault():
+                node.move()    
+            else:
+                node.move()
+                for receiver in self.nodes:
+                    node.send_message(receiver, "info")
 
     def print(self):
         if Map.LOG == True:
