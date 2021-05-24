@@ -8,7 +8,7 @@ class Node:
     LOG = True
     
     def __init__(self, id=0, signal=0, speed=0, \
-        mem_capacity=100, navigator=None, fault=0,\
+        mem_capacity=100, navigator=None, fault=0, \
         transmission_rate=10):
         self.id = "node_" + str(id)
         self.status = 1
@@ -132,7 +132,7 @@ class Node:
             print(f"Node {self.id} is moving from \
             {current_position} to {next_position} with a speed of {movement} m/s")
             
-    def fault(self, disaster=False):
+    def simulate_fault(self, disaster=False):
         fault_chance = self.fault
         if disaster:
             fault_chance = numpy.random.uniform(0.5, 1-fault_chance) 

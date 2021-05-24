@@ -11,7 +11,7 @@ def launch_batch_simulations():
     transmission_rate = [10, 20, 50]
     fault = [0.1, 0.3, 0.4]
     disaster = [0, 0.1, 0.2]
-    map_size = [100, 100]
+    map_size = [40, 40]
     simulation_seconds = 20 
     # -----------------------------------
     for i in range(no_batch_simulations):

@@ -17,7 +17,7 @@ class Navigator:
         # The network attribute is just the waypoint matrix of the map
         self.network = network
         self.route = self.find_route()
-        self.full_route = self.route + self.route[1:-1]
+        self.full_route = self.route + self.route[-1:1]
 
     def find_route(self):
         """
@@ -81,18 +81,15 @@ class Navigator:
         route_cost = 0 # g
         to_target_cost = 0 # h
         trajectory_cost = 0 # f
-        
         route_cost = abs(waypoint.get_coordinates()[0] - self.start.get_coordinates()[0]) \
                      + abs(waypoint.get_coordinates()[1] - self.start.get_coordinates()[1])
         to_target_cost = abs(waypoint.get_coordinates()[0] - self.target.get_coordinates()[0]) \
                      + abs(waypoint.get_coordinates()[1] - self.target.get_coordinates()[1])
-        
         trajectory_cost = route_cost + to_target_cost
         return trajectory_cost, route_cost
 
-
     def get_position(self):
-        return self.route[self.position%len(self.full_route)]
+        return self.route[int(self.position)%int(len(self.full_route))]
 
     def get_next_position(self, movement):
         self.position += movement

@@ -132,13 +132,13 @@ class Map:
     def update(self, disaster):
         for node in self.nodes:
             if disaster:
-                if not node.fault_m(disaster):
+                if not node.simulate_fault(disaster):
                     # the node does not move along
                     for receiver in self.nodes:
                         node.send_message(receiver, "sos")
                     for receiver in self.sinks:
                         node.send_message(receiver, "sos")
-            elif node.fault_m():
+            elif node.simulate_fault():
                 node.move()    
             else:
                 node.move()

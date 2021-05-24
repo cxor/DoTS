@@ -34,22 +34,22 @@ class Simulator:
         epochs = seconds * self.transmission_rate
         disaster_epochs = epochs / 10
         disaster_counter = disaster_epochs
-        disaster = False
+        disaster_happens = False
 
         for _ in range(epochs):
-            if disaster:
+            if disaster_happens:
                 if disaster_counter > 0:
                     disaster_chance = 1 
                 else:
-                    disaster = False
+                    disaster_happens = False
                     disaster_counter = disaster_epochs
                     disaster_chance = numpy.random.uniform(0,1)
             else:
                 disaster_chance = numpy.random.uniform(0,1)
             if disaster_chance >= 1 - self.disaster:
-                disaster = True
+                disaster_happens = True
                 disaster_counter -= 1
-            map.update(disaster=disaster)
+            map.update(disaster=disaster_happens)
             
     def plot(self):
         pass
