@@ -15,7 +15,8 @@ class Node:
         self.signal = signal
         self.navigator = navigator
         self.fault = fault
-        self.speed = (speed/2*transmission_rate, speed/transmission_rate)
+        self.reboot = 0
+        self.speed = (speed/(2*transmission_rate), speed/transmission_rate)
         self.buffer = Queue(mem_capacity)
         self.no_info_message_received = 0
         self.no_sos_message_received = 0
@@ -40,6 +41,12 @@ class Node:
 
     def set_status(self, status):
         self.status = status
+        
+    def set_reboot(self, reboot):
+        self.reboot = reboot
+        
+    def get_reboot(self):
+        return self.reboot
 
     def get_buffer(self):
         return self.buffer

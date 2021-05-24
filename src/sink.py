@@ -13,6 +13,8 @@ class Sink:
         self.status = 1
         self.signal = signal 
         self.buffer = Queue(mem_capacity)
+        self.fault = fault
+        self.reboot = 0
         self.no_info_message_received = 0
         self.no_sos_message_received = 0
         self.no_info_message_dropped = 0
@@ -36,6 +38,12 @@ class Sink:
     def set_buffer(self, buffer):
         self.buffer = buffer
         
+    def get_reboot(self):
+        return self.reboot
+
+    def set_reboot(self, reboot):
+        self.reboot = reboot
+
     def get_signal(self):
         return self.signal
 
@@ -75,6 +83,20 @@ class Sink:
             if Sink.LOG:
                 print(f"dropped {message.get_type()} \
                     packet from {message.get_sender_id()}")
+
+    
+    def simulate_fault(self, disaster=False):
+        fault_chance = self.fault
+        if disaster:
+            fault_chance = numpy.random.uniform(0.5, 1-fault_chance) 
+        fault_happens = numpy.random.uniform(0,1)
+        if fault_chance <= fault_happens:
+            self.no_faults += 1
+            if Sink.LOG:
+                print(f"Sink {self.id} has crashed") 
+            return True
+        else:
+            return False
 
             
 
