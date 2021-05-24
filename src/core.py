@@ -2,7 +2,7 @@ from simulator import Simulator
 import test
 
 def launch_batch_simulations():
-    no_batch_simulations = 3
+    no_batch_simulations = 1
     no_nodes = [50, 100, 200]
     no_sinks = [25, 50, 100]
     node_signal = [15, 12, 10]
@@ -12,7 +12,7 @@ def launch_batch_simulations():
     fault = [0.1, 0.3, 0.4]
     disaster = [0, 0.1, 0.2]
     map_size = [100, 100]
-    simulation_epochs = 20 
+    simulation_seconds = 20 
     # -----------------------------------
     for i in range(no_batch_simulations):
         simulator = Simulator(          \
@@ -24,12 +24,13 @@ def launch_batch_simulations():
             fault=fault[i],             \
             disaster=disaster[i],       \
             map_size=map_size,          \
-            transmission_rate=transmission_rate)
-        simulator.run(epochs=simulation_epochs)
-        simulator.plot()
+            transmission_rate=transmission_rate[i])
+        simulator.run(seconds=simulation_seconds)
+        #simulator.plot()
 
 def main():
-   test.find_route() 
+    launch_batch_simulations()
+    #test.message_exchange() 
 
 if __name__ == "__main__":
     main()

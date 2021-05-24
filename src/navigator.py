@@ -94,8 +94,8 @@ class Navigator:
     def get_position(self):
         return self.route[self.position%len(self.full_route)]
 
-    def get_next_position(self):
-        self.position += 1
+    def get_next_position(self, movement):
+        self.position += movement
         return self.get_position()
         
     def get_route(self):

@@ -15,13 +15,13 @@ class Node:
         self.signal = signal
         self.navigator = navigator
         self.fault = fault
-        # TODO: define how to describe the node speed
-        self.speed = round(numpy.random.uniform(speed/2, speed), 1)
+        self.speed = (speed/2*transmission_rate, speed/transmission_rate)
         self.buffer = Queue(mem_capacity)
         self.no_info_message_received = 0
         self.no_sos_message_received = 0
         self.no_info_message_dropped = 0
         self.no_sos_message_dropped = 0
+        self.no_faults = 0
 
     def get_id(self):
         return self.id
@@ -119,12 +119,28 @@ class Node:
         message = Message(sender_id=self.id, receiver_id=receiver.get_id(), \
             message_type=message_type)
         sensitivity = self.get_signal_sensitivity(receiver)
+        # DEBUG OPTION
+        sensitivity = 1
         receiver.receive_message(message=message, sensitivity=sensitivity)
         return None
 
     def move(self):
         current_position = self.navigator.get_position()
-        next_position = self.navigator.get_next_position()
+        movement = round(numpy.random.uniform(self.speed[0], self.speed[1]), 1)
+        next_position = self.navigator.get_next_position(movement)
         if Node.LOG:
             print(f"Node {self.id} is moving from \
-            {current_position} to {next_position}")
+            {current_position} to {next_position} with a speed of {movement} m/s")
+            
+    def fault(self, disaster=False):
+        fault_chance = self.fault
+        if disaster:
+            fault_chance = numpy.random.uniform(0.5, 1-fault_chance) 
+        fault_happens = numpy.random.uniform(0,1)
+        if fault_chance <= fault_happens:
+            self.no_faults += 1
+            if Node.LOG:
+                print(f"Node {self.id} has crashed") 
+            return True
+        else:
+            return False

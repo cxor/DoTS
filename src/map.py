@@ -44,7 +44,7 @@ class Map:
         #       2.2 Randomly activate some of its eligible neighbors
         # -------------------------------------        
         # Stage 1: create the waypoint skeleton
-        rows_no, columns_no = size[0], size[1]
+        rows_no, columns_no = int(size[0]), int(size[1])
         waypoint_matrix = numpy.full(shape=(rows_no,columns_no), fill_value=Waypoint())
         for i in range(rows_no):
             for j in range(columns_no):
@@ -119,7 +119,7 @@ class Map:
             start_waypoint.set_entity("node")
 
     def get_available_positions(self):
-        rows_no, columns_no = self.size[0], self.size[1]
+        rows_no, columns_no = int(self.size[0]), int(self.size[1])
         available_positions = []
         for i in range(rows_no):
             for j in range(columns_no):
@@ -132,15 +132,19 @@ class Map:
     def update(self, disaster):
         for node in self.nodes:
             if disaster:
-                if not node.fault(disaster):
+                if not node.fault_m(disaster):
                     # the node does not move along
                     for receiver in self.nodes:
                         node.send_message(receiver, "sos")
-            elif node.fault():
+                    for receiver in self.sinks:
+                        node.send_message(receiver, "sos")
+            elif node.fault_m():
                 node.move()    
             else:
                 node.move()
                 for receiver in self.nodes:
+                    node.send_message(receiver, "info")
+                for receiver in self.sinks:
                     node.send_message(receiver, "info")
 
     def print(self):

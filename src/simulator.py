@@ -24,20 +24,19 @@ class Simulator:
         self.disaster = disaster
         self.time_scale = 1 / self.transmission_rate
         self.map_scale = self.time_scale * self.node_speed
-        self.map_size = map_size / self.map_scale
-        self.stats = numpy.array([0, 0, 0, 0])
+        self.map_size = (map_size[0]//self.map_scale, map_size[1]//self.map_scale)
+        self.stats = numpy.array([0, 0, 0, 0, 0, 0])
 
     def run(self, seconds=10):
-        # TODO: load the parameters to build the maps
-        map = Map(size=self.map_size)
-        map.build(self.no_nodes, self.no_sinks, self.node_signal, \
-           self.sink_signal, self.fault, self.transmission_rate)
+        map = Map(self.no_nodes, self.no_sinks, self.node_signal, \
+                  self.sink_signal, self.node_speed, self.fault, \
+                  self.transmission_rate, self.map_size)
         epochs = seconds * self.transmission_rate
         disaster_epochs = epochs / 10
         disaster_counter = disaster_epochs
         disaster = False
 
-        for i in range(epochs):
+        for _ in range(epochs):
             if disaster:
                 if disaster_counter > 0:
                     disaster_chance = 1 
