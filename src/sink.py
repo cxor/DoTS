@@ -85,7 +85,7 @@ class Sink:
                     packet from {message.get_sender_id()}")
 
     
-    def simulate_fault(self, disaster=False):
+    def crash(self, disaster=False):
         fault_chance = self.fault
         if disaster:
             fault_chance = numpy.random.uniform(0.5, 1-fault_chance) 
