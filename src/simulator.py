@@ -25,19 +25,18 @@ class Simulator:
         self.time_scale = 1 / self.transmission_rate
         self.map_scale = self.time_scale * self.node_speed
         self.map_size = (map_size[0]//self.map_scale, map_size[1]//self.map_scale)
+        self.map = Map(self.map_size)
         self.nodes = []
         self.sinks = []
+        self.epochs = 0
         self.stats = numpy.array([0, 0, 0, 0, 0, 0])
 
     def run(self, seconds=10):
-        map = Map(self.no_nodes, self.no_sinks, self.node_signal, \
-                  self.sink_signal, self.node_speed, self.fault, \
-                  self.transmission_rate, self.map_size)
-        self.nodes = map.get_entitys()
-        self.sinks = map.get_sinks()
-        epochs = int(seconds * self.transmission_rate)
-        disaster_epochs = epochs // 10
-        fault_epochs = epochs // 50
+        Simulator.populate(self.no_nodes, self.no_sinks, self.node_signal, \
+                           self.sink_signal, self.node_speed, self.fault, \
+                           self.transmission_rate)
+        # self.nodes, self.sinks filled
+        self.epochs = int(seconds * self.transmission_rate)
         disaster_counter = disaster_epochs
         disaster_happens = False
 
@@ -54,17 +53,15 @@ class Simulator:
             if disaster_chance >= 1 - self.disaster:
                 disaster_happens = True
                 disaster_counter -= 1
-            if disaster_happens:
-                Simulator.simulate_disaster(map, self.nodes, self.sinks)
-            Simulator.simulate_fault(fault_epochs, disaster_happens)
-            map.update(disaster=disaster_happens)
-            Simulator.simulate_reboot()
+
+            Simulator.update(disaster=disaster_happens)
             
     def simulate_fault(self, fault_epochs, disaster_happens):
         for entity in self.nodes+self.sinks:
-            if entity.crash(disaster_happens):
-                entity.set_status(0)
-                entity.set_reboot(fault_epochs)
+            if not entity.get_status() == 0:
+                if entity.crash(disaster_happens):
+                    entity.set_status(0)
+                    entity.set_reboot(fault_epochs)
 
     def simulate_reboot(self):
         for entity in self.nodes+self.sinks:
@@ -75,8 +72,8 @@ class Simulator:
                 else:
                     entity.set_reboot(reboot_elapsed_time - 1)
                 
-    def simulate_disaster(self, map, disaster_epochs):
-        map_size = map.get_size()
+    def simulate_disaster(self, disaster_epochs):
+        map_size = self.map.get_size()
         disaster_radius = round(numpy.random.uniform(1, min(map_size)//2))
         disaster_x_epicenter = round(numpy.random.uniform(1, map_size[0]))
         disaster_y_epicenter = round(numpy.random.uniform(1, map_size[1]))
@@ -94,10 +91,31 @@ class Simulator:
                 and (disaster_min_coord[1] <= entity_y_coord) \
                 and (entity_y_coord <= disaster_max_coord[1]):
                     if entity.crash(disaster=True):
-                        entity.set_status(0)
+                        entity.set_status(-1)
                         entity.set_reboot(disaster_epochs)
 
-
+    def update(self, disaster):
+        # Fault/disaster handling (pre-computed)
+        if disaster:
+            disaster_duration = numpy.random.uniform(1, self.epochs)
+            Simulator.simulate_disaster(disaster_duration)
+        else:
+            fault_duration = numpy.random.uniform(1, self.epochs)
+            Simulator.simulate_fault(fault_duration)
+        # Node movement handling
+        for node in self.nodes:
+            if node.get_status != -1:
+                node.move()
+        # Entities communication handling
+        for node in self.nodes:
+            node_status = node.get_status()
+            if node_status == 1:
+                msg_type = "info"
+            elif node_status == -1:
+                msg_type = "sos"
+            for receiver in self.nodes+self.sinks:
+                node.send_message(receiver, msg_type)
+            
 
     def plot(self):
         pass
