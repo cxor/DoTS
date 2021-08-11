@@ -1,11 +1,15 @@
 from map import Map
+from navigator import Navigator
+from node import Node
+from sink import Sink
 import numpy
+import random
 
 class Simulator:
     
     def __init__(self,no_nodes, no_sinks, node_signal,\
         sink_signal, node_speed=10, fault=0, disaster=0, \
-        map_size=[100,100], transmission_rate=10):
+        map_size=[100,100], transmission_rate=10, duration=5):
         self.no_nodes = no_nodes
         self.no_sinks = no_sinks
         self.node_signal = node_signal
@@ -25,22 +29,50 @@ class Simulator:
         self.time_scale = 1 / self.transmission_rate
         self.map_scale = self.time_scale * self.node_speed
         self.map_size = (map_size[0]//self.map_scale, map_size[1]//self.map_scale)
-        self.map = Map(self.map_size)
+        self.map = Map(size=map_size, no_active_locations=no_nodes+no_sinks)
+        self.duration = duration
         self.nodes = []
         self.sinks = []
-        self.epochs = 0
+        self.epochs = int(duration * transmission_rate)
         self.stats = numpy.array([0, 0, 0, 0, 0, 0])
 
-    def run(self, seconds=10):
+    def populate(self, no_nodes, no_sinks, node_signal, sink_signal, \
+                 node_speed, fault, transmission_rate, map):
+        # NOTE: Network generation happens automatically 
+        # whenever a new map is instanciated
+        # --- Populate with sinks ---
+        available_positions = map.get_available_positions()
+        sink_locations = random.sample(available_positions, no_sinks)
+        for i in range(no_sinks):
+            current_waypoint = sink_locations[i]
+            sink = Sink(id=i, coordinates=current_waypoint.get_coordinates(), \
+                signal=sink_signal, fault=fault)
+            self.sinks.append(sink)
+        # --- Populate with nodes ---
+        available_positions = map.get_available_positions()
+        node_locations = random.sample(available_positions, no_nodes)
+        node_targets = random.sample(available_positions, no_nodes)
+        for i in range(no_nodes):
+            start_waypoint = node_locations[i]
+            target_waypoint = node_targets[i]
+            navigator = Navigator(start=start_waypoint, \
+                target=target_waypoint, network=self.network)
+            node = Node(id=i, signal=node_signal, speed=node_speed, \
+                    navigator=navigator, fault=fault, \
+                    transmission_rate=transmission_rate)
+            self.nodes.append(node)
+
+
+    def run(self):
         Simulator.populate(self.no_nodes, self.no_sinks, self.node_signal, \
                            self.sink_signal, self.node_speed, self.fault, \
-                           self.transmission_rate)
+                           self.transmission_rate, self.map)
         # self.nodes, self.sinks filled
-        self.epochs = int(seconds * self.transmission_rate)
-        disaster_counter = disaster_epochs
+        disaster_epochs = numpy.random.uniform(1, self.epochs)
+        disaster_counter = int(disaster_epochs)
         disaster_happens = False
 
-        for _ in range(epochs):
+        for _ in range(self.epochs):
             if disaster_happens:
                 if disaster_counter > 0:
                     disaster_chance = 1 
@@ -53,7 +85,6 @@ class Simulator:
             if disaster_chance >= 1 - self.disaster:
                 disaster_happens = True
                 disaster_counter -= 1
-
             Simulator.update(disaster=disaster_happens)
             
     def simulate_fault(self, fault_epochs, disaster_happens):
@@ -94,10 +125,11 @@ class Simulator:
                         entity.set_status(-1)
                         entity.set_reboot(disaster_epochs)
 
-    def update(self, disaster):
+    def update(self, disaster, disaster_counter):
         # Fault/disaster handling (pre-computed)
         if disaster:
-            disaster_duration = numpy.random.uniform(1, self.epochs)
+            # Decouple disaster zone identification from 
+            # epoch updating
             Simulator.simulate_disaster(disaster_duration)
         else:
             fault_duration = numpy.random.uniform(1, self.epochs)

@@ -13,6 +13,7 @@ def launch_batch_simulations():
     disaster = [0, 0.1, 0.2]
     map_size = [40, 40]
     simulation_seconds = 20 
+    duration = 5
     # -----------------------------------
     for i in range(no_batch_simulations):
         simulator = Simulator(          \
@@ -24,7 +25,8 @@ def launch_batch_simulations():
             fault=fault[i],             \
             disaster=disaster[i],       \
             map_size=map_size,          \
-            transmission_rate=transmission_rate[i])
+            transmission_rate=transmission_rate[i], \ 
+            duration=duration)
         simulator.run(seconds=simulation_seconds)
         #simulator.plot()
 

@@ -10,18 +10,15 @@ class Map:
     WAYPOINT_ACTIVATIONS = [0.95, 0.60, 0.45, 0.25]
     LOG = True
 
-    def __init__(self, no_nodes, no_sinks, 
-                 node_signal, sink_signal, node_speed, fault, 
-                 transmission_rate, size=[100,100]):
+    def __init__(self, size=[100,100], no_active_locations=2):                    
         self.size = size
-        self.nodes, self.sinks, self.network = [], [], []
+        self.no_active_locations = no_active_locations
+        self.network = []
+        ### self.nodes, self.sinks, self.network = [], [], []
         no_available_positions = 0
-        while no_available_positions < (no_nodes + no_sinks):
+        while no_available_positions < (no_active_locations):
             self.network = self.generate_network(self.size)
             no_available_positions = len(self.get_available_positions())
-        self.add_sinks(no_sinks, sink_signal, fault)
-        self.add_nodes(no_nodes, node_signal, 
-                       node_speed, fault, transmission_rate)
         
     def get_network(self):
         return self.network
@@ -29,13 +26,7 @@ class Map:
     def get_size(self):
         return self.size
 
-    def get_nodes(self):
-        return self.nodes
-
-    def get_sinks(self):
-        return self.sinks
-
-    def generate_network(self, size):
+    def generate_network(self, size=self.size):
         # The following method designs a waypoint network for the map.
         # It can be decomposed in 2 main stages:
         #   1. Create the waypoint skeleton
@@ -89,34 +80,6 @@ class Map:
                         neighbor_waypoint.add_neighbor(current_waypoint)
                         neighbor_waypoint.set_status(1)
         return waypoint_matrix
-    
-    def add_sinks(self, no_sinks, sink_signal, sink_fault):
-        available_positions = self.get_available_positions()
-        sink_locations = random.sample(available_positions, no_sinks)
-        for i in range(no_sinks):
-            current_waypoint = sink_locations[i]
-            sink = Sink(id=i, coordinates=current_waypoint.get_coordinates(), \
-                signal=sink_signal, fault=sink_fault)
-            self.sinks.append(sink)
-            # TODO: remove entity?
-            current_waypoint.set_entity("sink") 
-
-    def add_nodes(self, no_nodes, node_signal, node_speed, 
-                  node_fault, transmission_rate):
-        available_positions = self.get_available_positions()
-        node_locations = random.sample(available_positions, no_nodes)
-        node_targets = random.sample(available_positions, no_nodes)
-        for i in range(no_nodes):
-            start_waypoint = node_locations[i]
-            target_waypoint = node_targets[i]
-            navigator = Navigator(start=start_waypoint, \
-                target=target_waypoint, network=self.network)
-            node = Node(id=i, signal=node_signal, speed=node_speed, \
-                    navigator=navigator, fault=node_fault, \
-                    transmission_rate=transmission_rate)
-            self.nodes.append(node)
-            # TODO: remove entity?
-            start_waypoint.set_entity("node")
 
     def get_available_positions(self):
         rows_no, columns_no = int(self.size[0]), int(self.size[1])
