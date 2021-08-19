@@ -75,8 +75,11 @@ class Node:
         # A message is received if 1. the recipient buffer is
         # not full and 2. the interference does not significantly
         # clog the communication channel.
+        sensitivity = numpy.round(sensitivity, 2)
         interference = round(numpy.random.uniform(0,1), 2)
-        # TODO: parametrized obstacle rnadom draw
+        # TODO: parametrized obstacle random draw
+        if Node.LOG:
+            print(f"[{message.get_sender_id()}] <-> [{self.id}] sensitivity: {sensitivity}, interference: {interference}")
         if Node.LOG:
             print(f"[{self.id}] ", end="")
             if not (self.buffer.full()) and \
@@ -87,16 +90,14 @@ class Node:
                     self.no_sos_message_received += 1
                 self.buffer.put(message)
                 if Node.LOG:
-                    print(f"received {message.get_type()} \
-                        message from {message.get_sender_id()}")
+                    print(f"received {message.get_type()} message from {message.get_sender_id()}")
             else:
                 if message.get_type() == "info":
                     self.no_info_message_dropped += 1
                 elif message.get_type() == "sos":
                     self.no_sos_message_dropped += 1
                 if Node.LOG:
-                    print(f"dropped {message.get_type()} \
-                    message from {message.get_sender_id()}")
+                    print(f"dropped {message.get_type()} message from {message.get_sender_id()}")
                     
     def get_signal_sensitivity(self, receiver):
         distance = self.get_distance(receiver)
@@ -106,8 +107,8 @@ class Node:
     def get_distance(self, entity):
         x_position = self.get_position()[0]
         y_position = self.get_position()[1]
-        x_entity_position = self.get_position()[0]
-        y_entity_position = self.get_position()[1]
+        x_entity_position = entity.get_position()[0]
+        y_entity_position = entity.get_position()[1]
         distance = abs(x_position - x_entity_position) \
                    + abs(y_position - y_entity_position)
         return distance
@@ -126,13 +127,11 @@ class Node:
         message = Message(sender_id=self.id, receiver_id=receiver.get_id(), \
             message_type=message_type)
         sensitivity = self.get_signal_sensitivity(receiver)
-        # DEBUG OPTION
-        sensitivity = 1
         receiver.receive_message(message=message, sensitivity=sensitivity)
         return None
 
     def move(self):
-        current_position = self.navigator.get_position()
+        current_position = self.navator.get_position()
         movement = round(numpy.random.uniform(self.speed[0], self.speed[1]), 1)
         next_position = self.navigator.get_next_position(movement)
         if Node.LOG:

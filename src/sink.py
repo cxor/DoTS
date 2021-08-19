@@ -62,27 +62,28 @@ class Sink:
         # A message is received if 1. the recipient buffer is
         # not full and 2. the interference does not significantly
         # clog the communication channel.
+        sensitivity = numpy.round(sensitivity, 2)
         interference = round(numpy.random.uniform(0,1), 2) 
         if Sink.LOG:
+            print(f"[{message.get_sender_id()}] <-> [{self.id}] sensitivity: {sensitivity}, interference: {interference}")
+        if Sink.LOG:
             print(f"[{self.id}] ", end="")
-        if not (self.buffer.full()) and \
-            sensitivity < interference:
+        if not self.buffer.full() and \
+            sensitivity > interference:
             if message.get_type() == "info":
                 self.no_info_message_received += 1
             elif (message.get_type() == "sos"):
                 self.no_sos_message_received += 1
             self.buffer.put(message)
             if Sink.LOG:
-                print(f"received {message.get_type()} \
-                     packet from {message.get_sender_id()}")
+                print(f"received {message.get_type()} message from {message.get_sender_id()}")
         else:
             if message.get_type() == "info":
                 self.no_info_message_dropped += 1
             elif message.get_type() == "sos":
                 self.no_sos_message_dropped += 1
             if Sink.LOG:
-                print(f"dropped {message.get_type()} \
-                    packet from {message.get_sender_id()}")
+                print(f"dropped {message.get_type()} message from {message.get_sender_id()}")
 
     
     def crash(self, disaster=False):

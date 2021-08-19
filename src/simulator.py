@@ -5,7 +5,10 @@ from sink import Sink
 import numpy
 import random
 
+
 class Simulator:
+
+    LOG = True
     
     def __init__(self,no_nodes, no_sinks, node_signal,\
         sink_signal, node_speed=10, fault=0, disaster=0, \
@@ -36,31 +39,51 @@ class Simulator:
         self.epochs = int(duration * transmission_rate)
         self.stats = numpy.array([0, 0, 0, 0, 0, 0])
 
-    def populate(self, no_nodes, no_sinks, node_signal, sink_signal, \
-                 node_speed, fault, transmission_rate, map):
+    def get_entities_params(self):
+        return self.no_nodes, self.no_sinks, self.node_signal, self.sink_signal,\
+            self.node_speed, self.transmission_rate
+
+    def get_map(self):
+        return self.map
+
+    def get_nodes(self):
+        return self.nodes
+
+    def get_sinks(self):
+        return self.sinks
+        
+    def populate(self):
         # NOTE: Network generation happens automatically 
         # whenever a new map is instanciated
+        if Simulator.LOG:
+            print("Preparing simulation map...")
         # --- Populate with sinks ---
-        available_positions = map.get_available_positions()
-        sink_locations = random.sample(available_positions, no_sinks)
-        for i in range(no_sinks):
+        available_positions = self.map.get_available_positions()
+        sink_locations = random.sample(available_positions, self.no_sinks)
+        for i in range(self.no_sinks):
             current_waypoint = sink_locations[i]
             sink = Sink(id=i, coordinates=current_waypoint.get_coordinates(), \
-                signal=sink_signal, fault=fault)
+                signal=self.sink_signal, fault=self.fault)
             self.sinks.append(sink)
+            if Simulator.LOG:
+                print(f"Activating entity: sink_{i}")
         # --- Populate with nodes ---
-        available_positions = map.get_available_positions()
-        node_locations = random.sample(available_positions, no_nodes)
-        node_targets = random.sample(available_positions, no_nodes)
-        for i in range(no_nodes):
+        available_positions = self.map.get_available_positions()
+        node_locations = random.sample(available_positions, self.no_nodes)
+        node_targets = random.sample(available_positions, self.no_nodes)
+        for i in range(self.no_nodes):
             start_waypoint = node_locations[i]
             target_waypoint = node_targets[i]
             navigator = Navigator(start=start_waypoint, \
-                target=target_waypoint, network=self.network)
-            node = Node(id=i, signal=node_signal, speed=node_speed, \
-                    navigator=navigator, fault=fault, \
-                    transmission_rate=transmission_rate)
+                target=target_waypoint, network=self.map.get_network())
+            node = Node(id=i, signal=self.node_signal, speed=self.node_speed, \
+                    navigator=navigator, fault=self.fault, \
+                    transmission_rate=self.transmission_rate)
             self.nodes.append(node)
+            if Simulator.LOG:
+                print(f"Activating entity: node_{i}")
+        if Simulator.LOG:
+            print("--> Simulation map prepared.")
 
 
     def run(self):
@@ -125,7 +148,7 @@ class Simulator:
                         entity.set_status(-1)
                         entity.set_reboot(disaster_epochs)
 
-    def update(self, disaster, disaster_counter):
+    def update(self, disaster):
         # Fault/disaster handling (pre-computed)
         if disaster:
             # Decouple disaster zone identification from 

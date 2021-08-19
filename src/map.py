@@ -17,7 +17,7 @@ class Map:
         ### self.nodes, self.sinks, self.network = [], [], []
         no_available_positions = 0
         while no_available_positions < (no_active_locations):
-            self.network = self.generate_network(self.size)
+            self.network = self.generate_network()
             no_available_positions = len(self.get_available_positions())
         
     def get_network(self):
@@ -26,7 +26,8 @@ class Map:
     def get_size(self):
         return self.size
 
-    def generate_network(self, size=self.size):
+    def generate_network(self):
+        size = self.size
         # The following method designs a waypoint network for the map.
         # It can be decomposed in 2 main stages:
         #   1. Create the waypoint skeleton

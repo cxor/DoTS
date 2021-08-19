@@ -10,6 +10,8 @@ class ComparableWaypoint:
     waypoint: Any=field(compare=False)
 class Navigator:
 
+    LOG = True
+    
     def __init__(self, start=[0,0], target=[0,0], network=None):
         self.position = 0
         self.start = start
@@ -96,5 +98,5 @@ class Navigator:
         return self.get_position()
         
     def get_route(self):
-        return self.route
+        return self.full_route
     
