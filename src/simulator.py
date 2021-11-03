@@ -4,6 +4,7 @@ from node import Node
 from sink import Sink
 import numpy
 import random
+import time
 
 
 class Simulator:
@@ -38,6 +39,7 @@ class Simulator:
         self.sinks = []
         self.epochs = int(duration * transmission_rate)
         self.stats = numpy.array([0, 0, 0, 0, 0, 0])
+        self.disaster_overlay = numpy.array([0, 0, 0, 0])
 
     def get_entities_params(self):
         return self.no_nodes, self.no_sinks, self.node_signal, self.sink_signal,\
@@ -51,7 +53,13 @@ class Simulator:
 
     def get_sinks(self):
         return self.sinks
-        
+    
+    def get_stats(self):
+        return self.stats
+
+    def get_disaster_overlay(self):
+        return self.disaster_overlay
+    
     def populate(self):
         # NOTE: Network generation happens automatically 
         # whenever a new map is instanciated
@@ -87,9 +95,7 @@ class Simulator:
 
 
     def run(self):
-        Simulator.populate(self.no_nodes, self.no_sinks, self.node_signal, \
-                           self.sink_signal, self.node_speed, self.fault, \
-                           self.transmission_rate, self.map)
+        self.populate()
         # self.nodes, self.sinks filled
         disaster_epochs = numpy.random.uniform(1, self.epochs)
         disaster_counter = int(disaster_epochs)
@@ -101,21 +107,25 @@ class Simulator:
                     disaster_chance = 1 
                 else:
                     disaster_happens = False
-                    disaster_counter = disaster_epochs
+                    disaster_counter = int(disaster_epochs)
                     disaster_chance = numpy.random.uniform(0,1)
             else:
                 disaster_chance = numpy.random.uniform(0,1)
             if disaster_chance >= 1 - self.disaster:
                 disaster_happens = True
+                if disaster_counter == disaster_epochs:
+                    self.disaster_overlay = self.create_disaster_overlay()
                 disaster_counter -= 1
-            Simulator.update(disaster=disaster_happens)
+            if Simulator.LOG:
+                print("Simulation epoch no. " + str(_) + "/" + str(self.epochs))
+                time.sleep(2)
+            self.update(disaster=disaster_happens)
             
-    def simulate_fault(self, fault_epochs, disaster_happens):
+    def simulate_fault(self, disaster_happens=False):
         for entity in self.nodes+self.sinks:
             if not entity.get_status() == 0:
                 if entity.crash(disaster_happens):
                     entity.set_status(0)
-                    entity.set_reboot(fault_epochs)
 
     def simulate_reboot(self):
         for entity in self.nodes+self.sinks:
@@ -123,10 +133,26 @@ class Simulator:
                 reboot_elapsed_time = entity.get_reboot()
                 if reboot_elapsed_time == 0:
                     entity.set_status(1)
+                    entity.set_reboot(5)
                 else:
                     entity.set_reboot(reboot_elapsed_time - 1)
                 
-    def simulate_disaster(self, disaster_epochs):
+    def simulate_disaster(self):
+        disaster_min_x_coord = self.disaster_overlay[0]
+        disaster_min_y_coord = self.disaster_overlay[1]
+        disaster_max_x_coord = self.disaster_overlay[2]
+        disaster_max_y_coord = self.disaster_overlay[3]
+        for entity in self.nodes+self.sinks:
+            entity_x_coord = entity.get_position()[0]
+            entity_y_coord = entity.get_position()[1]
+            if (disaster_min_x_coord <= entity_x_coord) \
+                and (entity_x_coord <= disaster_max_x_coord) \
+                and (disaster_min_y_coord <= entity_y_coord) \
+                and (entity_y_coord <= disaster_max_y_coord):
+                    if entity.crash(disaster=True):
+                        entity.set_status(0)
+    
+    def create_disaster_overlay(self):
         map_size = self.map.get_size()
         disaster_radius = round(numpy.random.uniform(1, min(map_size)//2))
         disaster_x_epicenter = round(numpy.random.uniform(1, map_size[0]))
@@ -137,40 +163,35 @@ class Simulator:
         disaster_max_coord = \
             (min(map_size[0]-1, disaster_x_epicenter+disaster_radius),
             min(map_size[1]-1, disaster_y_epicenter+disaster_radius))
-        for entity in self.nodes+self.sinks:
-            entity_x_coord = entity.get_position()[0]
-            entity_y_coord = entity.get_position()[1]
-            if (disaster_min_coord[0] <= entity_x_coord) \
-                and (entity_x_coord <= disaster_max_coord[0]) \
-                and (disaster_min_coord[1] <= entity_y_coord) \
-                and (entity_y_coord <= disaster_max_coord[1]):
-                    if entity.crash(disaster=True):
-                        entity.set_status(-1)
-                        entity.set_reboot(disaster_epochs)
+        return \
+            disaster_min_coord[0],      \
+            disaster_min_coord[1],      \
+            disaster_max_coord[0],      \
+            disaster_max_coord[1]
 
-    def update(self, disaster):
-        # Fault/disaster handling (pre-computed)
-        if disaster:
-            # Decouple disaster zone identification from 
-            # epoch updating
-            Simulator.simulate_disaster(disaster_duration)
-        else:
-            fault_duration = numpy.random.uniform(1, self.epochs)
-            Simulator.simulate_fault(fault_duration)
-        # Node movement handling
+    def simulate_movement(self):
         for node in self.nodes:
-            if node.get_status != -1:
+            if node.get_status != 0:
                 node.move()
-        # Entities communication handling
+    
+    def simulate_communication(self):
         for node in self.nodes:
             node_status = node.get_status()
+            msg_type = "debug"
             if node_status == 1:
                 msg_type = "info"
             elif node_status == -1:
                 msg_type = "sos"
             for receiver in self.nodes+self.sinks:
                 node.send_message(receiver, msg_type)
-            
+                
+    def update(self, disaster):
+        if disaster:
+            self.simulate_disaster()
+        self.simulate_fault() 
+        self.simulate_reboot()
+        self.simulate_movement()
+        self.simulate_communication()
 
     def plot(self):
         pass

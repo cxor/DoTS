@@ -15,7 +15,7 @@ class Node:
         self.signal = signal
         self.navigator = navigator
         self.fault = fault
-        self.reboot = 0
+        self.reboot = 5
         self.speed = (speed/(2*transmission_rate), speed/transmission_rate)
         self.buffer = Queue(mem_capacity)
         self.no_info_message_received = 0
@@ -131,7 +131,7 @@ class Node:
         return None
 
     def move(self):
-        current_position = self.navator.get_position()
+        current_position = self.navigator.get_position()
         movement = round(numpy.random.uniform(self.speed[0], self.speed[1]), 1)
         next_position = self.navigator.get_next_position(movement)
         if Node.LOG:

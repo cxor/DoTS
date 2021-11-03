@@ -19,6 +19,7 @@ class Sink:
         self.no_sos_message_received = 0
         self.no_info_message_dropped = 0
         self.no_sos_message_dropped = 0
+        self.no_faults = 0
 
     def get_id(self):
         return self.id

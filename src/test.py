@@ -12,7 +12,7 @@ def create_simulator():
     transmission_rate = 10
     fault = 0.1
     disaster = 0
-    map_size = [40, 40]
+    map_size = [50, 50]
     simulation_seconds = 20
     simulator = Simulator(           \
             no_nodes=no_nodes,       \
@@ -91,16 +91,7 @@ def print_neighbors():
 def find_route():
     simulator = create_simulator()
     simulator.populate()
-#    map = simulator.get_map()
-#    map = Map(no_nodes=10, no_sinks=10, node_signal=10,
-#              sink_signal=15, node_speed=10, fault=0, 
-#              transmission_rate=1, size=[50,50])
-#    map.print()
-#    nodes = map.get_nodes()
     nodes = simulator.get_nodes()
     for node in nodes:
         navigator = node.get_navigator()
         print(f"Node {node.get_id()} route: {navigator.get_route()}")
-    
-    
-        # Insert the starting waypoint coordinates into the route
