@@ -193,5 +193,45 @@ class Simulator:
         self.simulate_movement()
         self.simulate_communication()
 
+    def get_stats(self):
+        no_info_msg_received = 0
+        no_sos_msg_received = 0
+        no_info_msg_dropped = 0
+        no_sos_msg_dropped = 0
+        no_faults = 0
+        for entity in self.nodes + self.sinks:
+            stats = entity.get_stats()
+            no_info_msg_received += stats[0]
+            no_sos_msg_received += stats[1]
+            no_info_msg_dropped += stats[2]
+            no_sos_msg_dropped += stats[3]
+            no_faults += stats[4]
+        no_entities = len(self.nodes)+len(self.sinks)
+        no_epochs = self.epochs
+        no_info_msg = no_info_msg_received + no_info_msg_dropped
+        no_sos_msg = no_sos_msg_received + no_sos_msg_dropped
+        no_msg = no_info_msg + no_sos_msg
+        no_info_msg_received_avg = no_info_msg_received / no_info_msg
+        no_sos_msg_received_avg = no_sos_msg_received / no_sos_msg
+        no_info_msg_dropped_avg = no_info_msg_dropped / no_info_msg
+        no_sos_msg_dropped_avg = no_sos_msg_dropped / no_sos_msg
+        no_faults_avg = (no_faults / no_entities) / no_epochs
+        if Simulator.LOG:
+            print("*** Simulation statistics ***")
+            print("-----------------------------")
+            print("Total message exchange attempts: " + no_msg)
+            print("Total info messages: " + no_info_msg)
+            print("Total sos messages: " + no_sos_msg)
+            print("Average info message received: " + no_info_msg_received_avg)
+            print("Average sos message received: " + no_sos_msg_received_avg)
+            print("Average fault rate: " + no_faults_avg)
+        stats = numpy.array(
+            [no_info_msg_received_avg,  \
+            no_sos_msg_received_avg,    \
+            no_info_msg_dropped_avg,    \
+            no_sos_msg_dropped_avg,     \
+            no_faults_avg])
+        return stats
+
     def plot(self):
         pass
