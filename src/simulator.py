@@ -218,13 +218,14 @@ class Simulator:
         no_faults_avg = (no_faults / no_entities) / no_epochs
         if Simulator.LOG:
             print("*** Simulation statistics ***")
-            print("-----------------------------")
+            print("+──────────────────────────────────────────────+")
             print("Total message exchange attempts: " + no_msg)
             print("Total info messages: " + no_info_msg)
             print("Total sos messages: " + no_sos_msg)
             print("Average info message received: " + no_info_msg_received_avg)
             print("Average sos message received: " + no_sos_msg_received_avg)
             print("Average fault rate: " + no_faults_avg)
+            print("+──────────────────────────────────────────────+")
         stats = numpy.array(
             [no_info_msg_received_avg,  \
             no_sos_msg_received_avg,    \
