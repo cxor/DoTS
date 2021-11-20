@@ -5,6 +5,8 @@ from sink import Sink
 import numpy
 import random
 import time
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 
 class Simulator:
@@ -37,7 +39,7 @@ class Simulator:
         self.duration = duration
         self.nodes = []
         self.sinks = []
-        self.epochs = int(duration * transmission_rate)
+        self.epochs = 10
         self.stats = numpy.array([0, 0, 0, 0, 0, 0])
         self.disaster_overlay = numpy.array([0, 0, 0, 0])
 
@@ -219,12 +221,12 @@ class Simulator:
         if Simulator.LOG:
             print("*** Simulation statistics ***")
             print("-----------------------------")
-            print("Total message exchange attempts: " + no_msg)
-            print("Total info messages: " + no_info_msg)
-            print("Total sos messages: " + no_sos_msg)
-            print("Average info message received: " + no_info_msg_received_avg)
-            print("Average sos message received: " + no_sos_msg_received_avg)
-            print("Average fault rate: " + no_faults_avg)
+            print("Total message exchange attempts: " + str(no_msg))
+            print("Total info messages: " + str(no_info_msg))
+            print("Total sos messages: " + str(no_sos_msg))
+            print("Average info message received: " + str(no_info_msg_received_avg))
+            print("Average sos message received: " + str(no_sos_msg_received_avg))
+            print("Average fault rate: " + str(no_faults_avg))
         stats = numpy.array(
             [no_info_msg_received_avg,  \
             no_sos_msg_received_avg,    \

@@ -2,6 +2,10 @@ from node import Node
 from sink import Sink
 from simulator import Simulator
 from map import Map
+import numpy
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
 
 def create_simulator():
     no_nodes = 10
@@ -37,7 +41,7 @@ def populate_map():
         print("Active sink: " + sink.get_id())
 
 def launch_batch_simulations():
-    no_batch_simulations = 1
+    no_batch_simulations = 2
     no_nodes = [50, 100, 200]
     no_sinks = [25, 50, 100]
     node_signal = [15, 12, 10]
@@ -48,6 +52,8 @@ def launch_batch_simulations():
     disaster = [0, 0.1, 0.2]
     map_size = [40, 40]
     simulation_seconds = 20 
+
+    stats = numpy.array([.0,.0,.0,.0,.0])
     # -----------------------------------
     for i in range(no_batch_simulations):
         simulator = Simulator(          \
@@ -62,7 +68,10 @@ def launch_batch_simulations():
             transmission_rate=transmission_rate[i], \
             duration=simulation_seconds)
         simulator.run()
-        #simulator.plot()    
+        stats += simulator.get_stats()
+        simulator.plot() 
+    #stats /= no_batch_simulations
+    plot(stats)   
                 
 def message_exchange():
     simulator = create_simulator()
@@ -95,3 +104,19 @@ def find_route():
     for node in nodes:
         navigator = node.get_navigator()
         print(f"Node {node.get_id()} route: {navigator.get_route()}")
+
+def plot(stats):
+    
+    fig = plt.figure(figsize=(4,4))
+    axs = fig.subplots()
+    fig.suptitle('Network traffic per time unit\n')
+
+    axs.plot(stats[0], 'o-', color='green')
+    axs.plot(stats[1], 'o-', color='red')
+    axs.plot(stats[2], 'o-', color='yellow')
+    axs.plot(stats[3], 'o-', color='blue')
+    axs.plot(stats[4], 'o-', color='orange')
+    plt.show()
+
+if __name__ == "__main__":
+    launch_batch_simulations()
