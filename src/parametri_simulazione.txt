@@ -1,0 +1,11 @@
+--run 3
+--nodes 20 30 40
+--sinks 7 10 17
+--sinksignal 0.7 0.56 0.64
+--nodespeed 11 18 16
+--nodesignal 0.5 0.57 0.62
+--trxrate 1.2 0.8 1.45
+--fault 0.21 0.13 0.10
+--disaster 0.16 0.23 0.22
+--mapsize 20 30
+--duration 120
