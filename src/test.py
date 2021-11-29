@@ -15,7 +15,7 @@ def create_simulator():
     node_speed = 10
     transmission_rate = 10
     fault = 0.1
-    disaster = 0
+    disaster = 3
     map_size = [50, 50]
     simulation_seconds = 20
     simulator = Simulator(           \
@@ -41,7 +41,7 @@ def populate_map():
         print("Active sink: " + sink.get_id())
 
 def launch_batch_simulations():
-    no_batch_simulations = 2
+    no_batch_simulations = 3
     no_nodes = [50, 100, 200]
     no_sinks = [25, 50, 100]
     node_signal = [15, 12, 10]
@@ -54,6 +54,7 @@ def launch_batch_simulations():
     simulation_seconds = 20 
 
     stats = numpy.array([.0,.0,.0,.0,.0])
+    stats_per_epoch = []
     # -----------------------------------
     for i in range(no_batch_simulations):
         simulator = Simulator(          \
@@ -69,9 +70,10 @@ def launch_batch_simulations():
             duration=simulation_seconds)
         simulator.run()
         stats += simulator.get_stats()
-        simulator.plot() 
-    #stats /= no_batch_simulations
-    plot(stats)   
+        stats_per_epoch.append(simulator.get_stats())
+        #simulator.plot() 
+    stats /= no_batch_simulations
+    plot(stats, stats_per_epoch)   
                 
 def message_exchange():
     simulator = create_simulator()
@@ -105,18 +107,41 @@ def find_route():
         navigator = node.get_navigator()
         print(f"Node {node.get_id()} route: {navigator.get_route()}")
 
-def plot(stats):
-    
-    fig = plt.figure(figsize=(4,4))
-    axs = fig.subplots()
-    fig.suptitle('Network traffic per time unit\n')
+def plot(stats, stats_per_epoch):
 
-    axs.plot(stats[0], 'o-', color='green')
-    axs.plot(stats[1], 'o-', color='red')
-    axs.plot(stats[2], 'o-', color='yellow')
-    axs.plot(stats[3], 'o-', color='blue')
-    axs.plot(stats[4], 'o-', color='orange')
+
+    fig, axs = plt.subplots(2)
+    
+    msg = ['Info', 'SOS']
+    epoch = range(len(stats_per_epoch))
+
+    width = 0.1
+
+    axs[0].bar(msg[0], stats[2], width, color='r')
+    axs[0].bar(msg[0], stats[0], width, bottom=stats[2], color='b')
+    axs[0].bar(msg[1], stats[3], width, color='r')
+    axs[0].bar(msg[1], stats[1], width, bottom=stats[3], color='b')
+    
+    axs[0].legend(labels=['Dropped', 'Received'])
+
+    for i in epoch:
+
+        axs[1].scatter(i, stats_per_epoch[i][0], marker='-o', color='r', linestyle='solid')
+        axs[1].scatter(i, stats_per_epoch[i][1], marker='-o', color='b', linestyle='solid')
+        axs[1].scatter(i, stats_per_epoch[i][2], marker='-o', color='y', linestyle='solid')
+        axs[1].scatter(i, stats_per_epoch[i][3], marker='-o', color='g', linestyle='solid')
+        axs[1].scatter(i, stats_per_epoch[i][4], marker='-o', color='o', linestyle='solid')
+
+    axs[1].xlabel('Epochs')
+    axs[1].ylabel('Average')
+    axs[1].legend(labels=['Average info message received', 
+                          'Average sos message received',
+                          'Average info message dropped',
+                          'Average sos message dropped',
+                          'Average fault rate'])
+    
     plt.show()
+
 
 if __name__ == "__main__":
     launch_batch_simulations()
