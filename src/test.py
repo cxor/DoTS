@@ -5,6 +5,7 @@ from map import Map
 import numpy
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from matplotlib.ticker import MaxNLocator
 
 
 def create_simulator():
@@ -41,7 +42,7 @@ def populate_map():
         print("Active sink: " + sink.get_id())
 
 def launch_batch_simulations():
-    no_batch_simulations = 3
+    no_batch_simulations = 2
     no_nodes = [50, 100, 200]
     no_sinks = [25, 50, 100]
     node_signal = [15, 12, 10]
@@ -126,19 +127,21 @@ def plot(stats, stats_per_epoch):
 
     for i in epoch:
 
-        axs[1].scatter(i, stats_per_epoch[i][0], marker='-o', color='r', linestyle='solid')
-        axs[1].scatter(i, stats_per_epoch[i][1], marker='-o', color='b', linestyle='solid')
-        axs[1].scatter(i, stats_per_epoch[i][2], marker='-o', color='y', linestyle='solid')
-        axs[1].scatter(i, stats_per_epoch[i][3], marker='-o', color='g', linestyle='solid')
-        axs[1].scatter(i, stats_per_epoch[i][4], marker='-o', color='o', linestyle='solid')
+        axs[1].plot(i, stats_per_epoch[i][0], marker='o', color='r', linestyle='-')
+        axs[1].plot(i, stats_per_epoch[i][1], marker='o', color='b', linestyle='-')
+        axs[1].plot(i, stats_per_epoch[i][2], marker='o', color='y', linestyle='-')
+        axs[1].plot(i, stats_per_epoch[i][3], marker='o', color='g', linestyle='-')
+        axs[1].plot(i, stats_per_epoch[i][4], marker='o', color='c', linestyle='-')
 
-    axs[1].xlabel('Epochs')
-    axs[1].ylabel('Average')
-    axs[1].legend(labels=['Average info message received', 
-                          'Average sos message received',
-                          'Average info message dropped',
-                          'Average sos message dropped',
-                          'Average fault rate'])
+    axs[1].xaxis.set_major_locator(MaxNLocator(integer=True))
+    axs[1].set_xlabel('Epochs')
+    axs[1].set_ylabel('Average')
+    axs[1].legend(bbox_to_anchor=(0, 0))
+    axs[1].legend(labels=['Avg info msg received', 
+                          'Avg sos msg received',
+                          'Avg info msg dropped',
+                          'Avg sos msg dropped',
+                          'Avg fault rate'])
     
     plt.show()
 
