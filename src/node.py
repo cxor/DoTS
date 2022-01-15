@@ -16,7 +16,7 @@ class Node:
         self.navigator = navigator
         self.fault = fault
         self.reboot = 5
-        self.speed = (speed/(2*transmission_rate), speed/transmission_rate)
+        self.speed = (speed, speed*2)
         self.buffer = Queue(mem_capacity)
         self.no_info_message_received = 0
         self.no_sos_message_received = 0
