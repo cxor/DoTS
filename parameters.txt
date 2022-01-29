@@ -1,7 +1,7 @@
 rounds          	3
 duration        	120
 map-size        	100		100
-nodes-speed     	12		18
+nodes-speed     	12		18      16
 nodes-number		20 		30		40
 sinks-number		10		15		20
 nodes-signal		8		10		12

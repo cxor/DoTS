@@ -1,116 +1,134 @@
 import test
 import sys
 import argparse
+import functools
 from simulator import Simulator
 import numpy
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib.ticker import MaxNLocator
 
+def preparse():
+    # Brief preprocessing needed to extrapolate arguments needed as
+    # parameter definition for other user given arguments.
+    preproc = argparse.ArgumentParser(add_help=False)
+    preproc.add_argument("-r", "--rounds", type=int, dest="rounds", default=1)
+    meta_args = preproc.parse_known_args()[0]   # meta_args = (known_args, unknown_args)
+    return meta_args
 
-def parse(sim_data):
-    #print(sim_data)
-    param_file = open(sim_data, "r")
-    data_lines = param_file.readlines()
-    no_epochs = 0
-    no_nodes = []
-    no_sinks = []
-    node_speed = []
-    trx_rate = []
-    fault = []
-    disaster = []
-    map_size = []
-    duration = []
-    node_signal = []
-    sink_signal = []
-    for line in data_lines:
-        if line.startswith("--run "):
-            no_epochs = int(line.lstrip("--run "))
-        elif line.startswith("--nodes "):
-            nodes = (line.lstrip("--nodes ")).split(" ")
-            no_nodes = [int(n) for n in nodes]
-            if(len(no_nodes) != no_epochs):
-                print(f"--nodes - Error: {no_epochs} parameters expected, but {len(no_nodes)} given")
-                break
-        elif line.startswith("--sinks "):
-            sinks = (line.lstrip("--sinks ")).split(" ")
-            no_sinks = [int(s) for s in sinks]
-            if(len(no_sinks) != no_epochs):
-                print(f"--sinks - Error: {no_epochs} parameters expected, but {len(no_sinks)} given")
-                break
-        elif line.startswith("--sinksignal "):
-            ssignal = (line.lstrip("--sinksignal ")).split(" ")
-            sink_signal = [float(s) for s in ssignal]
-            if(len(sink_signal) != no_epochs):
-                print(f"--sinksignal - Error: {no_epochs} parameters expected, but {len(sink_signal)} given")
-                break
-        elif line.startswith("--nodespeed "):
-            nodespeed = (line.lstrip("--nodespeed ")).split(" ")
-            node_speed = [int(n) for n in nodespeed]
-            if(len(node_speed) != no_epochs):
-                print(f"--nodespeed - Error: {no_epochs} parameters expected, but {len(node_speed)} given")
-                break
-        elif line.startswith("--nodesignal "):
-            nodesignal = (line.lstrip("--nodesignal ")).split(" ")
-            node_signal = [float(n) for n in nodesignal]
-            if(len(node_signal) != no_epochs):
-                print(f"--nodesignal - Error: {no_epochs} parameters expected, but {len(node_signal)} given")
-                break
-        elif line.startswith("--trxrate "):
-            trxrate = (line.lstrip("--trxrate ")).split(" ")
-            trx_rate = [float(t) for t in trxrate]
-            if(len(trx_rate) != no_epochs):
-                print(f"--trxrate - Error: {no_epochs} parameters expected, but {len(trx_rate)} given")
-                break
-        elif line.startswith("--fault "):
-            flt = (line.lstrip("--fault ")).split(" ")
-            fault = [float(f) for f in flt]
-            if(len(fault) != no_epochs):
-                print(f"--fault - Error: {no_epochs} parameters expected, but {len(fault)} given")
-                break
-        elif line.startswith("--disaster "):
-            dis = (line.lstrip("--disaster ")).split(" ")
-            disaster = [float(d) for d in dis]
-            if(len(disaster) != no_epochs):
-                print(f"--disaster - Error: {no_epochs} parameters expected, but {len(disaster)} given")
-                break
-        elif line.startswith("--mapsize "):
-            sizes = (line.lstrip("--mapsize ")).split(" ")
-            map_size = [int(s) for s in sizes]
-            if(len(map_size) != 2):
-                print(f"--disaster - Error: {2} parameters expected, but {len(map_size)} given")
-                break
-        elif line.startswith("--duration "):
-            duration = int(line.lstrip("--duration "))
-    print(f"Number of epochs: {no_epochs}")
-    print(f"Nodes for each epoch: {no_nodes}")
-    print(f"Sinks for each epoch: {no_sinks}")
-    print(f"Sink signal for each epoch: {sink_signal}")
-    print(f"Node signal for each epoch: {node_signal}")
-    print(f"Node speed for each epoch: {node_speed}")
-    print(f"Trx rate for each epoch: {trx_rate}")
-    print(f"Fault chance for each epoch: {fault}")
-    print(f"Disaster chance for each epoch: {disaster}")
-    print(f"Map size: {map_size[0]} {map_size[1]}")
-    print(f"Epochs' duration: {duration}")
-    args = (no_epochs, no_nodes, no_sinks, node_signal, sink_signal, node_speed, fault, disaster, map_size, trx_rate, duration)
-    return args 
+def parse():
+    # -----------------------------------------------------------
+    def range_check(value, min, max):
+        try:
+            value = float(value)
+        except ValueError as error:
+           raise argparse.ArgumentTypeError(str(error))
+        if value < min or value > max:
+            message = "Input value {} out of range".format(value)
+            raise argparse.ArgumentTypeError(message)
+        return value
+    # -----------------------------------------------------------
+    bool_float = functools.partial(range_check, min=0, max=1)
+    meta_args = preparse()
+    rounds = meta_args.rounds
+    parser = argparse.ArgumentParser(                   \
+        prog="dots", usage="%{prog}s [options]",     \
+        description="DoTS: delay-tolerant network simulator")
+    parser.add_argument("-r", "--rounds", type=int, dest="rounds", default=1, required=True, help="Number of simulation rounds")
+    parser.add_argument("-nn", "--nodes-number", type=int, dest="nodes_number", required=True, nargs=rounds, help="Number of nodes")
+    parser.add_argument("-sn", "--sinks-number", type=int, dest="sinks_number", required=True, nargs=rounds, help="Number of sinks")
+    parser.add_argument("-ns", "--nodes-signal", type=float, dest="nodes_signal", required=True, nargs=rounds, help="Nodes signal transmission power (float, dBm)")
+    parser.add_argument("-ss", "--sinks-signal", type=float, dest="sinks_signal", required=True, nargs=rounds, help="Sinks signal transmission power (float, dBm)")
+    parser.add_argument("-sp", "--nodes-speed", type=float, dest="nodes_speed", required=True, nargs=2, help="Nodes movement speed ((min,max) float, m/s)")
+    parser.add_argument("-tr", "--transmission-rate", type=int, dest="transmission_rate", required=True, nargs=rounds, help="Transmission rate for nodes (pkt/s)")
+    parser.add_argument("-fr", "--fault-rate", type=bool_float, dest="fault_rate", required=True, nargs=rounds, help="Probability of a unrecoverable software problem (float, within [0,1])")
+    parser.add_argument("-dr", "--disaster-rate", type=bool_float, dest="disaster_rate", required=True, nargs=rounds, help="Probability of a natural disaster (float, within [0,1])")
+    parser.add_argument("-mp", "--map-size", type=int, dest="map_size", required=True, nargs=2, help="Map size: length, width (int, meters)")
+    parser.add_argument("-d", "--duration", type=int, dest="duration", required=True, help="Simulation duration (int, seconds)")
+    parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Show detailed simulation log")
+    parser.add_argument("-p", "--plot", action="store_true", default=False, help="Plot the simulation results")
+    args = parser.parse_args()
+    return args
     
 
-def plot(stats):
-    pass
+def show(args):
+    print("*** Simulation outline ***")
+    print("━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    print("Simulation epochs: " + str(args.rounds))
+    print("Nodes number: " + str(args.nodes_number))
+    print("Sinks number: " + str(args.sinks_number))
+    print("Nodes signal power: " + str(args.nodes_signal))
+    print("Sinks signal power: " + str(args.sinks_signal))
+    print("Nodes speed: " + str(args.nodes_speed))
+    print("Transmission rate: " + str(args.transmission_rate))
+    print("Fault rate: " + str(args.fault_rate))
+    print("Disaster rate: " + str(args.disaster_rate))
+    print("Map size: " + str(args.map_size))
+    print("Simulation duration: " + str(args.duration))
+    if args.verbose:
+        print("Simulation log: YES")
+    else:
+        print("Simulation log: NO")
+    if args.plot:
+        print("Plot results: YES")
+    else:
+        print("Plot results: NO")
+        
+
+def plot(stats, stats_per_epoch):
+    fig, axs = plt.subplots(2)
+    
+    msg = ['INFO', 'SOS']
+    epoch = range(len(stats_per_epoch))
+    width = 0.1
+
+    axs[0].bar(msg[0], stats[2], width, color='r')
+    axs[0].bar(msg[0], stats[0], width, bottom=stats[2], color='b')
+    axs[0].bar(msg[1], stats[3], width, color='r')
+    axs[0].bar(msg[1], stats[1], width, bottom=stats[3], color='b')
+    
+    axs[0].legend(labels=['Dropped', 'Received'])
+
+    for i in epoch:
+        axs[1].plot(i, stats_per_epoch[i][0], marker='o', color='r', linestyle='-')
+        axs[1].plot(i, stats_per_epoch[i][1], marker='o', color='b', linestyle='-')
+        axs[1].plot(i, stats_per_epoch[i][2], marker='o', color='y', linestyle='-')
+        axs[1].plot(i, stats_per_epoch[i][3], marker='o', color='g', linestyle='-')
+        axs[1].plot(i, stats_per_epoch[i][4], marker='o', color='c', linestyle='-')
+
+    axs[1].xaxis.set_major_locator(MaxNLocator(integer=True))
+    axs[1].set_xlabel('Epochs')
+    axs[1].set_ylabel('Average')
+    axs[1].legend(bbox_to_anchor=(0, 0))
+    axs[1].legend(labels=['Avg info msg received', 
+                          'Avg sos msg received',
+                          'Avg info msg dropped',
+                          'Avg sos msg dropped',
+                          'Avg fault rate'])
+    plt.show()
 
 def main():
-    if(len(sys.argv) == 2):
-        args = parse(sys.argv[1])
-    else:
-        print("Usage: python core.py sim_data.txt")
-    no_simulations = args[0]
-    simulator = Simulator(args)
+    args = parse()
+    no_simulations = args.rounds
     stats = numpy.array([0,0,0,0,0])
-    for _ in range(no_simulations):
+    stats_per_epoch = numpy.array([0,0,0,0,0])
+    for i in range(no_simulations):
+        simulator = Simulator(
+            no_nodes=args.nodes_number[i], 
+            no_sinks=args.sinks_number[i], 
+            node_signal=args.nodes_signal[i],
+            sink_signal=args.sinks_signal[i],
+            node_speed=args.nodes_speed[i],
+            fault=args.fault_rate[i],
+            disaster=args.disaster_rate[i],
+            map_size=args.map_size,
+            transmission_rate=args.transmission_rate[i],
+            duration=args.duration)
         simulator.run()
-        stats += simulator.stat()
-        simulator.plot()
+        stats_per_epoch.append(simulator.get_stats())
+        stats += simulator.get_stats()
     stats /= no_simulations
-    plot(stats)
+    plot(stats, stats_per_epoch)
 
 if __name__ == "__main__":
     main()

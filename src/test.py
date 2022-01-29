@@ -2,6 +2,7 @@ from node import Node
 from sink import Sink
 from simulator import Simulator
 from map import Map
+import numpy
 
 def create_simulator():
     no_nodes = 10
@@ -48,6 +49,8 @@ def launch_batch_simulations():
     disaster = [0, 0.1, 0.2]
     map_size = [40, 40]
     simulation_seconds = 20 
+    stats = numpy.array([.0,.0,.0,.0,.0])
+    stats_per_epoch = []
     # -----------------------------------
     for i in range(no_batch_simulations):
         simulator = Simulator(          \
@@ -62,7 +65,12 @@ def launch_batch_simulations():
             transmission_rate=transmission_rate[i], \
             duration=simulation_seconds)
         simulator.run()
-        #simulator.plot()    
+        #simulator.plot()
+        stats += simulator.get_stats()
+        stats_per_epoch.append(simulator.get_stats())
+        #simulator.plot() 
+    stats /= no_batch_simulations
+    plot(stats, stats_per_epoch)       
                 
 def message_exchange():
     simulator = create_simulator()
