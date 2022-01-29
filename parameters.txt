@@ -1,0 +1,11 @@
+rounds          	3
+duration        	120
+map-size        	100		100
+nodes-speed     	12		18
+nodes-number		20 		30		40
+sinks-number		10		15		20
+nodes-signal		8		10		12
+sinks-signal		10 		12		8
+transmission-rate	10		10		15
+fault-rate      	0.1		0.2		0.3
+disaster-rate		0.1		0.1		0.2

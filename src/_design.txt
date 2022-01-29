@@ -1,0 +1,24 @@
+class Simulator
+class Message
+class Navigator
+class Map
+class Waypoint
+class Node
+class Sink
+
+* Simulation -> runs different 3 kind of simulations
+    * Healthy network, i.e. no faults
+    * Stressed network, i.e. random failure
+    * Disaster, i.e temporary black out of communications
+
+    * Disaster requires modification to Map, and to Navigator capabilities
+
+* Navigator -> builds paths for nodes
+    * reverts the path whenever the node enters a disastered zone
+    
+
+    * message rate -> opportunistic [DONE]
+    * buffer is full -> drop the last 10% of messages [TODO]
+    * metasimulations -> keep splitted [DONE]
+    * store stats to plot overlapping charts [TODO]
+    * fault -> unique value for both nodes and sinks [DONE]
