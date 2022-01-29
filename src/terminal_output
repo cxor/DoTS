@@ -1,0 +1,37 @@
+laura@DESKTOP-Q2GSOK4 /c/d/L/U/S/P/dtnSimulator (master)> dots --run
+fish: Unknown command: \r
+dots.fish (line 1):
+cat $run_input | \
+                 ^
+in command substitution
+        called on line 9 of file dots.fish
+in function 'dots' with arguments '--run'
+
+
+
+
+
+cd Simulation\ and\ Performance\ Evaluation/
+
+echo 'ciao' | \
+    string match 'ciao'
+
+
+read > 
+
+
+
+
+/cygdrive/d/Laura Scoccianti/UniTN/Simulation and Performance Evaluation/PROGETTOOO/dtnSimulator
+
+
+
+laura@DESKTOP-Q2GSOK4 /c/d/L/U/S/P/dtnSimulator (master)> python src/core.py
+Traceback (most recent call last):
+  File "src/core.py", line 1, in <module>
+    import test
+  File "D:\Laura Scoccianti\UniTN\Simulation and Performance Evaluation\PROGETTO
+OO\dtnSimulator\src\test.py", line 20
+    print("Simulation epochs: " + str(args.rounds))
+    ^
+IndentationError: unexpected indent

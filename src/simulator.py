@@ -118,7 +118,7 @@ class Simulator:
                 disaster_counter -= 1
             if Simulator.LOG:
                 print("Simulation epoch no. " + str(_) + "/" + str(self.epochs))
-                time.sleep(2)
+                time.sleep(0.1)
             self.update(disaster=disaster_happens)
             
     def simulate_fault(self, disaster_happens=False):
@@ -219,12 +219,12 @@ class Simulator:
         if Simulator.LOG:
             print("*** Simulation statistics ***")
             print("+──────────────────────────────────────────────+")
-            print("Total message exchange attempts: " + no_msg)
-            print("Total info messages: " + no_info_msg)
-            print("Total sos messages: " + no_sos_msg)
-            print("Average info message received: " + no_info_msg_received_avg)
-            print("Average sos message received: " + no_sos_msg_received_avg)
-            print("Average fault rate: " + no_faults_avg)
+            print("Total message exchange attempts: " + str(no_msg))
+            print("Total info messages: " + str(no_info_msg))
+            print("Total sos messages: " + str(no_sos_msg))
+            print("Average info message received: " + str(no_info_msg_received_avg))
+            print("Average sos message received: " + str(no_sos_msg_received_avg))
+            print("Average fault rate: " + str(no_faults_avg))
             print("+──────────────────────────────────────────────+")
         stats = numpy.array(
             [no_info_msg_received_avg,  \
@@ -233,6 +233,3 @@ class Simulator:
             no_sos_msg_dropped_avg,     \
             no_faults_avg])
         return stats
-
-    def plot(self):
-        pass

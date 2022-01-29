@@ -64,11 +64,11 @@ class Node:
         return self.signal
 
     def get_stats(self):
-        stats = numpy.array[self.no_info_message_received, 
+        stats = numpy.array([self.no_info_message_received, 
                             self.no_info_message_dropped,
                             self.no_sos_message_received, 
                             self.no_sos_message_received,
-                            self.no_faults]
+                            self.no_faults])
         # Using numpy array to easily ensamblimg stats later
         return stats
 

@@ -110,8 +110,8 @@ def plot(stats, stats_per_epoch):
 def main():
     args = parse()
     no_simulations = args.rounds
-    stats = numpy.array([0,0,0,0,0])
-    stats_per_epoch = numpy.array([0,0,0,0,0])
+    stats = numpy.array([.0,.0,.0,.0,.0])
+    stats_per_epoch = []
     for i in range(no_simulations):
         simulator = Simulator(
             no_nodes=args.nodes_number[i], 
@@ -126,9 +126,13 @@ def main():
             duration=args.duration)
         simulator.run()
         stats_per_epoch.append(simulator.get_stats())
+        print(str(stats_per_epoch))
         stats += simulator.get_stats()
     stats /= no_simulations
     plot(stats, stats_per_epoch)
 
 if __name__ == "__main__":
     main()
+#python3 core.py --rounds 1 --duration 10 --map-size 100,100 --nodes-speed 12 --nodes-number 20 --sinks-number 10 --nodes-signal 8 --sinks-signal 10 --transmission-rate 10 --fault-rate 0.1 --disaster-rate 0.1
+#python core.py --rounds 1 --duration 10 --map-size 100 100 --nodes-speed 12 --nodes-number 20 --sinks-number 10 --nodes-signal 8 --sinks-signal 10 --transmission-rate 10 --fault-rate 0.1 --disaster-rate 0.1
+    

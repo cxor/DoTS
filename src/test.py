@@ -4,6 +4,32 @@ from simulator import Simulator
 from map import Map
 import numpy
 
+def parse(args):
+    for i in range(args.rounds):
+        simulator = Simulator(
+            no_nodes=args.nodes_number[i], 
+            no_sinks=args.sinks_number[i], 
+            node_signal=args.nodes_signal[i],
+            sink_signal=args.sinks_signal[i],
+            node_speed=args.nodes_speed[i],
+            fault=args.fault_rate[i],
+            disaster=args.disaster_rate[i],
+            map_size=args.map_size,
+            transmission_rate=args.transmission_rate[i],
+            duration=args.duration)
+        print("Simulation epochs: " + str(args.rounds))
+        print("Nodes number: " + str(simulator.no_nodes))
+        print("Sinks number: " + str(simulator.no_sinks))
+        print("Nodes signal power: " + str(simulator.node_signal))
+        print("Sinks signal power: " + str(simulator.sink_signal))
+        print("Nodes speed: " + str(simulator.node_speed))
+        print("Transmission rate: " + str(simulator.transmission_rate))
+        print("Fault rate: " + str(simulator.fault))
+        print("Disaster rate: " + str(simulator.disaster))
+        print("Map size: " + str(simulator.map_size))
+        print("Simulation duration: " + str(simulator.duration))
+
+
 def create_simulator():
     no_nodes = 10
     no_sinks = 5
