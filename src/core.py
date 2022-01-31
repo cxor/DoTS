@@ -133,6 +133,8 @@ def main():
 
 if __name__ == "__main__":
     main()
-#python3 core.py --rounds 1 --duration 10 --map-size 100,100 --nodes-speed 12 --nodes-number 20 --sinks-number 10 --nodes-signal 8 --sinks-signal 10 --transmission-rate 10 --fault-rate 0.1 --disaster-rate 0.1
-#python core.py --rounds 1 --duration 10 --map-size 100 100 --nodes-speed 12 --nodes-number 20 --sinks-number 10 --nodes-signal 8 --sinks-signal 10 --transmission-rate 10 --fault-rate 0.1 --disaster-rate 0.1
-    
+
+# python core.py --rounds 2 --duration 1 --map-size 50 50 --nodes-speed 12 16 --nodes-number 10 20 --sinks-number 7 10 --nodes-signal 8 10 --sinks-signal 10 12 --transmission-rate 10 13 --fault-rate 0.1 0.2 --disaster-rate 0.1 0.2 
+# python core.py --rounds 2 --duration 1 --map-size 50 50 --nodes-speed 12 16 --nodes-number 10 20 --sinks-number 7 10 --nodes-signal 8 10 --sinks-signal 10 12 --transmission-rate 10 13 --fault-rate 0.4 0.6 --disaster-rate 0.1 0.2 
+# python core.py --rounds 2 --duration 1 --map-size 50 50 --nodes-speed 8 13 --nodes-number 20 40 --sinks-number 12 20 --nodes-signal 8 10 --sinks-signal 10 12 --transmission-rate 10 13 --fault-rate 0.05 0.1 --disaster-rate 0.1 0.2
+# python core.py --rounds 1 --duration 10 --map-size 50 50 --nodes-speed 8 13 --nodes-number 28 --sinks-number 16 --nodes-signal 9 --sinks-signal 11 --transmission-rate 13 --fault-rate 0.1 --disaster-rate 0.1

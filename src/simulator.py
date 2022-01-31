@@ -201,9 +201,14 @@ class Simulator:
         no_faults = 0
         for entity in self.nodes + self.sinks:
             stats = entity.get_stats()
+            #no_info_msg_received += stats[0]
+            #no_sos_msg_received += stats[1]
+            #no_info_msg_dropped += stats[2]
+            #no_sos_msg_dropped += stats[3]
+            #no_faults += stats[4]
             no_info_msg_received += stats[0]
-            no_sos_msg_received += stats[1]
-            no_info_msg_dropped += stats[2]
+            no_sos_msg_received += stats[2]
+            no_info_msg_dropped += stats[1]
             no_sos_msg_dropped += stats[3]
             no_faults += stats[4]
         no_entities = len(self.nodes)+len(self.sinks)
