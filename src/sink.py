@@ -65,6 +65,8 @@ class Sink:
         # not full and 2. the interference does not significantly
         # clog the communication channel.
         sensitivity = numpy.round(sensitivity, 2)
+        if sensitivity < 0.65:
+            return
         interference = round(numpy.random.uniform(0,1), 2) 
         if Sink.LOG:
             print(f"[{message.get_sender_id()}] <-> [{self.id}] sensitivity: {sensitivity}, interference: {interference}")

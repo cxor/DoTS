@@ -10,10 +10,11 @@ import time
 class Simulator:
 
     LOG = True
+    SPECTRUM = 0.65
     
     def __init__(self,no_nodes, no_sinks, node_signal,\
-        sink_signal, node_speed=10, fault=0, disaster=0, \
-        map_size=[100,100], transmission_rate=10, duration=5):
+        sink_signal, node_speed=[10,20], fault=0, disaster=0, \
+        map_size=[100,100], transmission_rate=10, duration=5, spectrum=0.65):
         self.no_nodes = no_nodes
         self.no_sinks = no_sinks
         self.node_signal = node_signal
@@ -31,10 +32,11 @@ class Simulator:
         self.fault = fault
         self.disaster = disaster
         self.time_scale = 1 / self.transmission_rate
-        self.map_scale = self.time_scale * self.node_speed
+        self.map_scale = self.time_scale * self.node_speed[1]
         self.map_size = (map_size[0]//self.map_scale, map_size[1]//self.map_scale)
         self.map = Map(size=map_size, no_active_locations=no_nodes+no_sinks)
         self.duration = duration
+        Simulator.SPECTRUM = spectrum
         self.nodes = []
         self.sinks = []
         self.epochs = int(duration * transmission_rate)

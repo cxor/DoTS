@@ -45,6 +45,7 @@ def parse():
     parser.add_argument("-dr", "--disaster-rate", type=bool_float, dest="disaster_rate", required=True, nargs=rounds, help="Probability of a natural disaster (float, within [0,1])")
     parser.add_argument("-mp", "--map-size", type=int, dest="map_size", required=True, nargs=2, help="Map size: length, width (int, meters)")
     parser.add_argument("-d", "--duration", type=int, dest="duration", required=True, help="Simulation duration (int, seconds)")
+    parser.add_argument("-ws", "--working-spectrum", type=bool_float, dest="spectrum", required=False, help="Hard threshold for nodes sensitivity (float, within [0,1])")
     parser.add_argument("-v", "--verbose", action="store_true", default=False, help="Show detailed simulation log")
     parser.add_argument("-p", "--plot", action="store_true", default=False, help="Plot the simulation results")
     args = parser.parse_args()
@@ -118,12 +119,13 @@ def main():
             no_sinks=args.sinks_number[i], 
             node_signal=args.nodes_signal[i],
             sink_signal=args.sinks_signal[i],
-            node_speed=args.nodes_speed[i],
+            node_speed=args.nodes_speed,
             fault=args.fault_rate[i],
             disaster=args.disaster_rate[i],
             map_size=args.map_size,
             transmission_rate=args.transmission_rate[i],
-            duration=args.duration)
+            duration=args.duration,
+            spectrum=args.spectrum)
         simulator.run()
         stats_per_epoch.append(simulator.get_stats())
         print(str(stats_per_epoch))
