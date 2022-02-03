@@ -98,7 +98,7 @@ class Simulator:
     def run(self):
         self.populate()
         # self.nodes, self.sinks filled
-        disaster_epochs = numpy.random.uniform(1, self.epochs)
+        disaster_epochs = int(numpy.random.uniform(1, self.epochs))
         disaster_counter = int(disaster_epochs)
         disaster_happens = False
 
@@ -114,6 +114,8 @@ class Simulator:
                 disaster_chance = numpy.random.uniform(0,1)
             if disaster_chance >= 1 - self.disaster:
                 disaster_happens = True
+                if Simulator.LOG:
+                    print("A disaster has begun!")
                 if disaster_counter == disaster_epochs:
                     self.disaster_overlay = self.create_disaster_overlay()
                 disaster_counter -= 1
@@ -124,7 +126,7 @@ class Simulator:
             
     def simulate_fault(self, disaster_happens=False):
         for entity in self.nodes+self.sinks:
-            if not entity.get_status() == 0:
+            if entity.get_status() == 1 :
                 if entity.crash(disaster_happens):
                     entity.set_status(0)
 
@@ -152,6 +154,8 @@ class Simulator:
                 and (entity_y_coord <= disaster_max_y_coord):
                     if entity.crash(disaster=True):
                         entity.set_status(0)
+                    else:
+                        entity.set_status(-1)
     
     def create_disaster_overlay(self):
         map_size = self.map.get_size()
@@ -181,7 +185,7 @@ class Simulator:
             if node_status == 0:
                 if Node.LOG:
                     print(f"[{node.get_id()}] is unable to communicate (FAULT status probed)")
-                    return
+                    continue
             msg_type = "debug"
             if node_status == 1:
                 msg_type = "info"

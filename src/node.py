@@ -7,7 +7,7 @@ import numpy
 
 class Node:
 
-    LOG = True
+    LOG = False
     SPECTRUM = 0.65
     
     def __init__(self, id=0, signal=0, speed=[10,20], \
@@ -152,9 +152,9 @@ class Node:
     def crash(self, disaster=False):
         fault_chance = self.fault
         if disaster:
-            fault_chance = numpy.random.uniform(0.5, 1-fault_chance) 
+            fault_chance = numpy.random.uniform(0.5, 1-fault_chance)
         fault_happens = numpy.random.uniform(0,1)
-        if fault_chance <= fault_happens:
+        if fault_happens <= fault_chance:
             self.no_faults += 1
             if Node.LOG:
                 print(f"Node {self.id} has crashed") 

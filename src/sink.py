@@ -4,7 +4,7 @@ from message import Message
 import numpy
 class Sink:
 
-    LOG = True
+    LOG = False
     SPECTRUM = 0.65
 
     def __init__(self, id=0, coordinates=[-1,-1], \
