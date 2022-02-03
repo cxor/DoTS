@@ -10,7 +10,6 @@ import time
 class Simulator:
 
     LOG = True
-    SPECTRUM = 0.65
     
     def __init__(self,no_nodes, no_sinks, node_signal,\
         sink_signal, node_speed=[10,20], fault=0, disaster=0, \
@@ -36,10 +35,10 @@ class Simulator:
         self.map_size = (map_size[0]//self.map_scale, map_size[1]//self.map_scale)
         self.map = Map(size=map_size, no_active_locations=no_nodes+no_sinks)
         self.duration = duration
-        Simulator.SPECTRUM = spectrum
         self.nodes = []
         self.sinks = []
         self.epochs = int(duration * transmission_rate)
+        self.epoch_counter = 0
         self.stats = numpy.array([0, 0, 0, 0, 0, 0])
         self.disaster_overlay = numpy.array([0, 0, 0, 0])
 
@@ -179,6 +178,10 @@ class Simulator:
     def simulate_communication(self):
         for node in self.nodes:
             node_status = node.get_status()
+            if node_status == 0:
+                if Node.LOG:
+                    print(f"[{node.get_id()}] is unable to communicate (FAULT status probed)")
+                    return
             msg_type = "debug"
             if node_status == 1:
                 msg_type = "info"
@@ -188,6 +191,7 @@ class Simulator:
                 node.send_message(receiver, msg_type)
                 
     def update(self, disaster):
+        self.epoch_counter += 1
         if disaster:
             self.simulate_disaster()
         self.simulate_fault() 
@@ -214,15 +218,20 @@ class Simulator:
             no_sos_msg_dropped += stats[3]
             no_faults += stats[4]
         no_entities = len(self.nodes)+len(self.sinks)
-        no_epochs = self.epochs
+        no_epochs_elapsed = self.epoch_counter
         no_info_msg = no_info_msg_received + no_info_msg_dropped
         no_sos_msg = no_sos_msg_received + no_sos_msg_dropped
         no_msg = no_info_msg + no_sos_msg
-        no_info_msg_received_avg = no_info_msg_received / no_info_msg
-        no_sos_msg_received_avg = no_sos_msg_received / no_sos_msg
-        no_info_msg_dropped_avg = no_info_msg_dropped / no_info_msg
-        no_sos_msg_dropped_avg = no_sos_msg_dropped / no_sos_msg
-        no_faults_avg = (no_faults / no_entities) / no_epochs
+        no_faults_avg = 0 if no_faults == 0 else (no_faults / no_entities) / no_epochs_elapsed 
+        # no_info_msg_received_avg = no_info_msg_received / no_info_msg
+        no_info_msg_received_avg = 0 if no_info_msg == 0 else no_info_msg_received / no_info_msg
+        # no_sos_msg_received_avg = no_sos_msg_received / no_sos_msg
+        no_sos_msg_received_avg = 0 if no_sos_msg == 0 else no_sos_msg_received / no_sos_msg
+        # no_info_msg_dropped_avg = no_info_msg_dropped / no_info_msg
+        no_info_msg_dropped_avg = 0 if no_info_msg == 0 else no_info_msg_dropped / no_info_msg
+        #no_sos_msg_dropped_avg = no_sos_msg_dropped / no_sos_msg
+        no_sos_msg_dropped_avg = 0 if no_sos_msg == 0 else no_sos_msg_dropped / no_sos_msg
+        # no_faults_avg = (no_faults / no_entities) / no_epochs
         if Simulator.LOG:
             print("*** Simulation statistics ***")
             print("+──────────────────────────────────────────────+")

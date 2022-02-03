@@ -3,9 +3,12 @@ from navigator import Navigator
 from queue import Queue
 from message import Message
 import numpy
+
+
 class Node:
 
     LOG = True
+    SPECTRUM = 0.65
     
     def __init__(self, id=0, signal=0, speed=[10,20], \
         mem_capacity=100, navigator=None, fault=0, \
@@ -132,7 +135,7 @@ class Node:
         # if the sensitivity is too low, it means that in a real case
         # scenario the two nodes would be out of reach from each other
         # and we must not consider a message exchange between them
-        if sensitivity < Simulator.SPECTRUM:
+        if sensitivity < Node.SPECTRUM:
             return None
         receiver.receive_message(message=message, sensitivity=sensitivity)
         return None

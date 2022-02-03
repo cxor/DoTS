@@ -5,6 +5,7 @@ import numpy
 class Sink:
 
     LOG = True
+    SPECTRUM = 0.65
 
     def __init__(self, id=0, coordinates=[-1,-1], \
         signal=15, mem_capacity=100, fault=0):
@@ -65,7 +66,7 @@ class Sink:
         # not full and 2. the interference does not significantly
         # clog the communication channel.
         sensitivity = numpy.round(sensitivity, 2)
-        if sensitivity < 0.65:
+        if sensitivity < Sink.SPECTRUM:
             return
         interference = round(numpy.random.uniform(0,1), 2) 
         if Sink.LOG:

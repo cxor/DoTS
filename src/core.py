@@ -128,7 +128,6 @@ def main():
             spectrum=args.spectrum)
         simulator.run()
         stats_per_epoch.append(simulator.get_stats())
-        print(str(stats_per_epoch))
         stats += simulator.get_stats()
     stats /= no_simulations
     plot(stats, stats_per_epoch)
