@@ -102,26 +102,31 @@ class Simulator:
         disaster_counter = int(disaster_epochs)
         disaster_happens = False
 
-        for _ in range(self.epochs):
-            if disaster_happens:
-                if disaster_counter > 0:
+        for i in range(self.epochs):
+            if disaster_happens: # 4
+                if disaster_counter >= 0: # 5.1
                     disaster_chance = 1 
-                else:
+                else: # 5.2
                     disaster_happens = False
+                    disaster_epochs = int(numpy.random.uniform(1, self.epochs - i))
                     disaster_counter = int(disaster_epochs)
                     disaster_chance = numpy.random.uniform(0,1)
-            else:
+            else: # 4.1 / 0
                 disaster_chance = numpy.random.uniform(0,1)
+            # -----------------------------------------------------------------------------
             if disaster_chance >= 1 - self.disaster:
-                disaster_happens = True
+                # The code here executes when a disaster is on
+                disaster_happens = True # 1
                 if Simulator.LOG:
                     print("A disaster has begun!")
-                if disaster_counter == disaster_epochs:
+                if disaster_counter == disaster_epochs: # 2
+                    # Here starts the disaster
                     self.disaster_overlay = self.create_disaster_overlay()
-                disaster_counter -= 1
+                disaster_counter -= 1 # 3
+            # -----------------------------------------------------------------------------
             if Simulator.LOG:
-                print("Simulation epoch no. " + str(_) + "/" + str(self.epochs))
-                time.sleep(0.1)
+                print("Simulation epoch no. " + str(i) + "/" + str(self.epochs))
+                #time.sleep(0.1)
             self.update(disaster=disaster_happens)
             
     def simulate_fault(self, disaster_happens=False):
