@@ -27,6 +27,7 @@ class Node:
         self.no_info_message_dropped = 0
         self.no_sos_message_dropped = 0
         self.no_faults = 0
+        self.disaster_involved = False
 
     def get_id(self):
         return self.id
@@ -72,7 +73,8 @@ class Node:
                             self.no_info_message_dropped,
                             self.no_sos_message_received, 
                             self.no_sos_message_dropped,
-                            self.no_faults])
+                            self.no_faults,
+                            self.disaster_involved])
         # Using numpy array to easily ensamblimg stats later
         return stats
 

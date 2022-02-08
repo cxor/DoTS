@@ -7,6 +7,7 @@ import numpy
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import FormatStrFormatter
 
 def preparse():
     # Brief preprocessing needed to extrapolate arguments needed as
@@ -76,7 +77,7 @@ def show(args):
         print("Plot results: NO")
         
 
-def plot(stats, stats_per_epoch):
+def plot(stats, stats_per_epoch, theoretical_total_msg, no_entities):
     fig, axs = plt.subplots(2)
     
     msg = ['INFO', 'SOS']
@@ -88,31 +89,56 @@ def plot(stats, stats_per_epoch):
     axs[0].bar(msg[1], stats[3], width, color='r')
     axs[0].bar(msg[1], stats[1], width, bottom=stats[3], color='b')
     
-    axs[0].legend(labels=['Dropped', 'Received'])
-
+    box = axs[0].get_position()
+    axs[0].set_position([box.x0, box.y0, box.width*0.6, box.height])
+    axs[0].legend(labels=['Dropped', 'Received'], loc='center left', bbox_to_anchor=(1,0.5))
+    round_info = []
+    avg_info_rcv = []
+    avg_sos_rcv = []
+    avg_fault_rate = []
+    entities_involved_disaster = []
+    msg_exchanged_vs_theoretical = []
+    i_round = []
     for i in epoch:
-        axs[1].plot(i+1, stats_per_epoch[i][0], marker='o', color='r', linestyle='dashed')
-        axs[1].plot(i+1, stats_per_epoch[i][1], marker='o', color='b', linestyle='dashed')
-        axs[1].plot(i+1, stats_per_epoch[i][2], marker='o', color='y', linestyle='dashed')
-        axs[1].plot(i+1, stats_per_epoch[i][3], marker='o', color='g', linestyle='dashed')
-        axs[1].plot(i+1, stats_per_epoch[i][4], marker='o', color='c', linestyle='dashed')
+        round_info.append(f"Round {i+1}\nTotal msg= {stats_per_epoch[i][5]}")
+        avg_info_rcv.append(stats_per_epoch[i][0])
+        avg_sos_rcv.append(stats_per_epoch[i][1])
+        avg_fault_rate.append(stats_per_epoch[i][4])
+        entities_involved_disaster.append(stats_per_epoch[i][6]/no_entities[i])
+        msg_exchanged_vs_theoretical.append(stats_per_epoch[i][5]/theoretical_total_msg[i])
+        i_round.append(i+1)
+
+    # To plot:
+    # DONE - real msg exchanged / theoretical msg exchanged, theoretical msg exchanged = duration*tx_rate
+    # - avg disaster rate exhibited
+
+    # this plots the msg exchanges occurred against the theoretical ones 
+    axs[1].bar(i_round, msg_exchanged_vs_theoretical, width=0.1, color='gainsboro', label="% msg exchanged vs\ntheoretical total")
+
+    # these plot stats about the average percentage of msg received per simulation
+    axs[1].plot(i_round, avg_info_rcv, marker='o', color='springgreen', linestyle='-', label="Avg info msg received")
+    axs[1].plot(i_round, avg_sos_rcv, marker='o', color='mediumorchid', linestyle='-', label="Avg sos msg received")
+    axs[1].plot(i_round, entities_involved_disaster, marker='o', color='dimgrey', linestyle='-', label="% nodes involved in\ndisasters")
+    axs[1].plot(i_round, avg_fault_rate, marker='o', color='orange', linestyle='-', label="Avg fault rate")
 
     axs[1].xaxis.set_major_locator(MaxNLocator(integer=True))
     axs[1].set_xlabel('Round')
     axs[1].set_ylabel('Average')
+    axs[1].set_ylim(top=1.1)
     #axs[1].legend(bbox_to_anchor=(0, 0))
-    axs[1].legend(labels=['Avg info msg received', 
-                          'Avg sos msg received',
-                          'Avg info msg dropped',
-                          'Avg sos msg dropped',
-                          'Avg fault rate'])
+    box = axs[1].get_position()
+    axs[1].set_position([box.x0, box.y0, box.width*0.6, box.height])
+    axs[1].legend(loc='center left', bbox_to_anchor=(1,0.5))
+    axs[1].xaxis.set_minor_formatter(FormatStrFormatter(round_info))
     plt.show()
 
 def main():
     args = parse()
     no_simulations = args.rounds
-    stats = numpy.array([.0,.0,.0,.0,.0])
+    stats = numpy.array([.0,.0,.0,.0,.0,.0,.0])
     stats_per_epoch = []
+    theoretical_total_msg = []
+    no_entities = []
     for i in range(no_simulations):
         simulator = Simulator(
             no_nodes=args.nodes_number[i], 
@@ -129,8 +155,10 @@ def main():
         simulator.run()
         stats_per_epoch.append(simulator.get_stats())
         stats += simulator.get_stats()
+        theoretical_total_msg.append(args.transmission_rate[i]*args.duration*args.nodes_number[i]*(args.nodes_number[i]-1))
+        no_entities.append(args.nodes_number[i]+args.sinks_number[i])
     stats /= no_simulations
-    plot(stats, stats_per_epoch)
+    plot(stats, stats_per_epoch, theoretical_total_msg, no_entities)
 
 if __name__ == "__main__":
     main()

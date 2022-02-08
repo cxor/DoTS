@@ -39,7 +39,7 @@ class Simulator:
         self.sinks = []
         self.epochs = int(duration * transmission_rate)
         self.epoch_counter = 0
-        self.stats = numpy.array([0, 0, 0, 0, 0, 0])
+        self.stats = numpy.array([0, 0, 0, 0, 0, 0, 0])
         self.disaster_overlay = numpy.array([0, 0, 0, 0])
 
     def get_entities_params(self):
@@ -157,6 +157,7 @@ class Simulator:
                 and (entity_x_coord <= disaster_max_x_coord) \
                 and (disaster_min_y_coord <= entity_y_coord) \
                 and (entity_y_coord <= disaster_max_y_coord):
+                    entity.disaster_involved=True
                     if entity.crash(disaster=True):
                         entity.set_status(0)
                     else:
@@ -214,18 +215,16 @@ class Simulator:
         no_info_msg_dropped = 0
         no_sos_msg_dropped = 0
         no_faults = 0
+        no_involved_in_disasters = 0
         for entity in self.nodes + self.sinks:
             stats = entity.get_stats()
-            #no_info_msg_received += stats[0]
-            #no_sos_msg_received += stats[1]
-            #no_info_msg_dropped += stats[2]
-            #no_sos_msg_dropped += stats[3]
-            #no_faults += stats[4]
             no_info_msg_received += stats[0]
             no_sos_msg_received += stats[2]
             no_info_msg_dropped += stats[1]
             no_sos_msg_dropped += stats[3]
             no_faults += stats[4]
+            if stats[5]:
+                no_involved_in_disasters += 1
         no_entities = len(self.nodes)+len(self.sinks)
         no_epochs_elapsed = self.epoch_counter
         no_info_msg = no_info_msg_received + no_info_msg_dropped
@@ -250,11 +249,14 @@ class Simulator:
             print("Average info message received: " + str(no_info_msg_received_avg))
             print("Average sos message received: " + str(no_sos_msg_received_avg))
             print("Average fault rate: " + str(no_faults_avg))
+            print("Entities involved in disasters: " + str(no_involved_in_disasters))
             print("+──────────────────────────────────────────────+")
         stats = numpy.array(
             [no_info_msg_received_avg,  \
             no_sos_msg_received_avg,    \
             no_info_msg_dropped_avg,    \
             no_sos_msg_dropped_avg,     \
-            no_faults_avg])
+            no_faults_avg,              \
+            no_msg,
+            no_involved_in_disasters])
         return stats
