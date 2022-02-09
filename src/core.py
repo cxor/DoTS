@@ -78,20 +78,17 @@ def show(args):
         
 
 def plot(stats, stats_per_epoch, theoretical_total_msg, no_entities):
-    fig, axs = plt.subplots(2)
-    
-    msg = ['INFO', 'SOS']
+    fig, axs = plt.subplots(3)
     epoch = range(len(stats_per_epoch))
-    width = 0.1
 
-    axs[0].bar(msg[0], stats[2], width, color='r')
-    axs[0].bar(msg[0], stats[0], width, bottom=stats[2], color='b')
-    axs[0].bar(msg[1], stats[3], width, color='r')
-    axs[0].bar(msg[1], stats[1], width, bottom=stats[3], color='b')
+    info_stats = [stats[0], stats[2]]
+    sos_stats = [stats[1], stats[3]]
+    labels_info = ['Avg info msg received', 'Avg info msg dropped']
+    labels_sos = ['Avg SOS msg received', 'Avg SOS msg received']
     
-    box = axs[0].get_position()
-    axs[0].set_position([box.x0, box.y0, box.width*0.6, box.height])
-    axs[0].legend(labels=['Dropped', 'Received'], loc='center left', bbox_to_anchor=(1,0.5))
+    axs[0].pie(sos_stats, labels=labels_sos, autopct='%1.1f%%', shadow=True, startangle=90)
+    axs[1].pie(info_stats, labels=labels_info, autopct='%1.1f%%', shadow=True, startangle=90)
+      
     round_info = []
     avg_info_rcv = []
     avg_sos_rcv = []
@@ -113,23 +110,23 @@ def plot(stats, stats_per_epoch, theoretical_total_msg, no_entities):
     # - avg disaster rate exhibited
 
     # this plots the msg exchanges occurred against the theoretical ones 
-    axs[1].bar(i_round, msg_exchanged_vs_theoretical, width=0.1, color='gainsboro', label="% msg exchanged vs\ntheoretical total")
+    axs[2].bar(i_round, msg_exchanged_vs_theoretical, width=0.1, color='gainsboro', label="% msg exchanged vs\ntheoretical total")
 
     # these plot stats about the average percentage of msg received per simulation
-    axs[1].plot(i_round, avg_info_rcv, marker='o', color='springgreen', linestyle='-', label="Avg info msg received")
-    axs[1].plot(i_round, avg_sos_rcv, marker='o', color='mediumorchid', linestyle='-', label="Avg sos msg received")
-    axs[1].plot(i_round, entities_involved_disaster, marker='o', color='dimgrey', linestyle='-', label="% nodes involved in\ndisasters")
-    axs[1].plot(i_round, avg_fault_rate, marker='o', color='orange', linestyle='-', label="Avg fault rate")
+    axs[2].plot(i_round, avg_info_rcv, marker='o', color='springgreen', linestyle='-', label="Avg info msg received")
+    axs[2].plot(i_round, avg_sos_rcv, marker='o', color='mediumorchid', linestyle='-', label="Avg sos msg received")
+    axs[2].plot(i_round, entities_involved_disaster, marker='o', color='dimgrey', linestyle='-', label="% nodes involved in\ndisasters")
+    axs[2].plot(i_round, avg_fault_rate, marker='o', color='orange', linestyle='-', label="Avg fault rate")
 
-    axs[1].xaxis.set_major_locator(MaxNLocator(integer=True))
-    axs[1].set_xlabel('Round')
-    axs[1].set_ylabel('Average')
-    axs[1].set_ylim(top=1.1)
-    #axs[1].legend(bbox_to_anchor=(0, 0))
-    box = axs[1].get_position()
-    axs[1].set_position([box.x0, box.y0, box.width*0.6, box.height])
-    axs[1].legend(loc='center left', bbox_to_anchor=(1,0.5))
-    axs[1].xaxis.set_minor_formatter(FormatStrFormatter(round_info))
+    axs[2].xaxis.set_major_locator(MaxNLocator(integer=True))
+    axs[2].set_xlabel('Round')
+    axs[2].set_ylabel('Average')
+    axs[2].set_ylim(top=1.1)
+    #axs[2].legend(bbox_to_anchor=(0, 0))
+    box = axs[2].get_position()
+    axs[2].set_position([box.x0, box.y0, box.width*0.6, box.height])
+    axs[2].legend(loc='center left', bbox_to_anchor=(1,0.5))
+    axs[2].xaxis.set_minor_formatter(FormatStrFormatter(round_info))
     plt.show()
 
 def main():
