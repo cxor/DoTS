@@ -77,7 +77,7 @@ def show(args):
         print("Plot results: NO")
         
 
-def plot(stats, stats_per_epoch, theoretical_total_msg, no_entities):
+def plot(stats, stats_per_epoch, theoretical_total_msg, no_entities, sim_description):
     fig, axs = plt.subplots(2)
     
     msg = ['INFO', 'SOS']
@@ -96,6 +96,12 @@ def plot(stats, stats_per_epoch, theoretical_total_msg, no_entities):
     avg_info_rcv = []
     avg_sos_rcv = []
     avg_fault_rate = []
+    lb_ci_info_rcv = []
+    ub_ci_info_rcv = []
+    lb_ci_sos_rcv = []
+    ub_ci_sos_rcv = []
+    lb_ci_fault_rate = []
+    ub_ci_fault_rate = []
     entities_involved_disaster = []
     msg_exchanged_vs_theoretical = []
     i_round = []
@@ -104,10 +110,15 @@ def plot(stats, stats_per_epoch, theoretical_total_msg, no_entities):
         avg_info_rcv.append(stats_per_epoch[i][0])
         avg_sos_rcv.append(stats_per_epoch[i][1])
         avg_fault_rate.append(stats_per_epoch[i][4])
+        lb_ci_info_rcv.append(stats_per_epoch[i][7])
+        ub_ci_info_rcv.append(stats_per_epoch[i][7])
+        lb_ci_sos_rcv.append(stats_per_epoch[i][8])
+        ub_ci_sos_rcv.append(stats_per_epoch[i][8])
+        lb_ci_fault_rate.append(stats_per_epoch[i][9])
+        ub_ci_fault_rate.append(stats_per_epoch[i][9])
         entities_involved_disaster.append(stats_per_epoch[i][6]/no_entities[i])
         msg_exchanged_vs_theoretical.append(stats_per_epoch[i][5]/theoretical_total_msg[i])
         i_round.append(i+1)
-
     # To plot:
     # DONE - real msg exchanged / theoretical msg exchanged, theoretical msg exchanged = duration*tx_rate
     # - avg disaster rate exhibited
@@ -116,29 +127,34 @@ def plot(stats, stats_per_epoch, theoretical_total_msg, no_entities):
     axs[1].bar(i_round, msg_exchanged_vs_theoretical, width=0.1, color='gainsboro', label="% msg exchanged vs\ntheoretical total")
 
     # these plot stats about the average percentage of msg received per simulation
-    axs[1].plot(i_round, avg_info_rcv, marker='o', color='springgreen', linestyle='-', label="Avg info msg received")
+    axs[1].plot(i_round, avg_info_rcv, marker='o', color='limegreen', linestyle='-', label="Avg info msg received")
     axs[1].plot(i_round, avg_sos_rcv, marker='o', color='mediumorchid', linestyle='-', label="Avg sos msg received")
     axs[1].plot(i_round, entities_involved_disaster, marker='o', color='dimgrey', linestyle='-', label="% nodes involved in\ndisasters")
     axs[1].plot(i_round, avg_fault_rate, marker='o', color='orange', linestyle='-', label="Avg fault rate")
+    axs[1].errorbar(i_round, avg_info_rcv, yerr=[lb_ci_info_rcv, ub_ci_info_rcv], fmt='.', color='limegreen', ecolor='limegreen', capsize=5)
+    axs[1].errorbar(i_round, avg_sos_rcv, yerr=[lb_ci_sos_rcv, ub_ci_sos_rcv], fmt='.', color='mediumorchid', ecolor='mediumorchid', capsize=5)
+    axs[1].errorbar(i_round, avg_fault_rate, yerr=[lb_ci_fault_rate, ub_ci_fault_rate], fmt='.', color='orange', ecolor='orange', capsize=5)
 
     axs[1].xaxis.set_major_locator(MaxNLocator(integer=True))
-    axs[1].set_xlabel('Round')
-    axs[1].set_ylabel('Average')
+    axs[1].set_xlabel('# Simulation')
+    axs[1].set_ylabel('Percentage (%)')
     axs[1].set_ylim(top=1.1)
     #axs[1].legend(bbox_to_anchor=(0, 0))
     box = axs[1].get_position()
     axs[1].set_position([box.x0, box.y0, box.width*0.6, box.height])
     axs[1].legend(loc='center left', bbox_to_anchor=(1,0.5))
     axs[1].xaxis.set_minor_formatter(FormatStrFormatter(round_info))
+    print(sim_description)      #   REMEMBER TO COPY THIS: IT'S FOR THE CAPTION IN THE REPORT
     plt.show()
 
 def main():
     args = parse()
     no_simulations = args.rounds
-    stats = numpy.array([.0,.0,.0,.0,.0,.0,.0])
+    stats = numpy.array([.0,.0,.0,.0,.0,.0,.0, .0, .0, .0])
     stats_per_epoch = []
     theoretical_total_msg = []
     no_entities = []
+    sim_description = f"Map size {args.map_size}, Duration: {args.duration} seconds, Nodes speed {args.nodes_speed}\n"
     for i in range(no_simulations):
         simulator = Simulator(
             no_nodes=args.nodes_number[i], 
@@ -157,8 +173,9 @@ def main():
         stats += simulator.get_stats()
         theoretical_total_msg.append(args.transmission_rate[i]*args.duration*args.nodes_number[i]*(args.nodes_number[i]-1))
         no_entities.append(args.nodes_number[i]+args.sinks_number[i])
+        sim_description += f"Sim. {i+1}: {args.nodes_number[i]} nodes, {args.sinks_number[i]}, node signal: {args.nodes_signal[i]}, sink signal: {args.sinks_signal[i]}, transmission rate: {args.transmission_rate[i]} msg/s,\nfault probability: {args.fault_rate[i]}, disaster probability: {args.disaster_rate[i]}\n"
     stats /= no_simulations
-    plot(stats, stats_per_epoch, theoretical_total_msg, no_entities)
+    plot(stats, stats_per_epoch, theoretical_total_msg, no_entities, sim_description)
 
 if __name__ == "__main__":
     main()
