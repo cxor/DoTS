@@ -13,7 +13,7 @@ class Node:
     
     def __init__(self, id=0, signal=0, speed=[10,20], \
         mem_capacity=100, navigator=None, fault=0, \
-        transmission_rate=10):
+        transmission_rate=10, time_scale=1):
         self.id = "node_" + str(id)
         self.status = 1
         self.signal = signal
@@ -29,6 +29,8 @@ class Node:
         self.no_sos_message_dropped = 0
         self.no_faults = 0
         self.disaster_involved = False
+        self.time_scale = time_scale
+        self.mov_rescale = self.time_scale * self.speed
 
     def get_id(self):
         return self.id
@@ -40,7 +42,8 @@ class Node:
         return self.navigator.get_position()
     
     def get_next_position(self, update=False):
-        return self.navigator.get_next_position(movement=round(self.speed), update=False)
+        movement = round(self.mov_rescale * self.speed)
+        return self.navigator.get_next_position(movement=movement, update=False)
 
     def set_position(self, coordinates):
         self.position = coordinates
@@ -167,7 +170,8 @@ class Node:
     def move(self):
         current_position = self.navigator.get_position()
         self.speed = round(numpy.random.uniform(self.speed_interval[0], self.speed_interval[1]), 1)
-        movement = self.speed
+        self.mov_rescale = self.time_scale * self.speed
+        movement = self.speed * self.mov_rescale
         next_position = self.navigator.get_next_position(movement)
         if Node.LOG:
             print(f"Node {self.id} is moving from \

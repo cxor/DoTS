@@ -32,7 +32,7 @@ class Simulator:
         self.fault = fault
         self.disaster = disaster
         self.time_scale = 1 / self.transmission_rate
-        self.map_scale = self.time_scale * self.node_speed[1]
+        self.map_scale = self.time_scale * self.node_speed[0]
         self.map_size = (map_size[0]//self.map_scale, map_size[1]//self.map_scale)
         self.map = Map(size=map_size, no_active_locations=no_nodes+no_sinks)
         self.duration = duration
@@ -88,7 +88,8 @@ class Simulator:
                 target=target_waypoint, network=self.map.get_network())
             node = Node(id=i, signal=self.node_signal, speed=self.node_speed, \
                     navigator=navigator, fault=self.fault, \
-                    transmission_rate=self.transmission_rate)
+                    transmission_rate=self.transmission_rate, \
+                    time_scale=self.time_scale)
             self.nodes.append(node)
             if Simulator.LOG:
                 print(f"Activating entity: node_{i}")

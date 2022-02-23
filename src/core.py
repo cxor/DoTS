@@ -78,9 +78,11 @@ def show(args):
         
 
 def plot(stats, stats_per_epoch, theoretical_total_msg, no_entities, sim_description):
-    fig, axs = plt.subplots(3)
-    fig.set_size_inches(5.5, 7.5)
-    fig.set_dpi(100)
+
+    fig = plt.figure(figsize=(5.5, 6.5))
+
+    sub1 = fig.add_subplot(2,2,1)
+    sub2 = fig.add_subplot(2,2,2)
 
     msg = ['INFO', 'SOS']
     epoch = range(len(stats_per_epoch))
@@ -91,8 +93,15 @@ def plot(stats, stats_per_epoch, theoretical_total_msg, no_entities, sim_descrip
     labels_info = ['Avg info msg received', 'Avg info msg dropped']
     labels_sos = ['Avg sos msg received', 'Avg sos msg dropped']
     
-    axs[0].pie(sos_stats, labels=labels_sos, autopct='%1.1f%%', shadow=False, startangle=90, normalize=True)
-    axs[1].pie(info_stats, labels=labels_info, autopct='%1.1f%%', shadow=False, startangle=90, normalize=True)
+    sub1.pie(sos_stats, autopct='%1.1f%%', shadow=False, startangle=90, normalize=True, radius=2)
+    sub2.pie(info_stats, autopct='%1.1f%%', shadow=False, startangle=90, normalize=True, radius=2)
+    
+    box = sub1.get_position()
+    sub1.set_position([box.x0, box.y0, box.width, box.height*0.6])
+    sub1.legend(labels_sos, loc='lower center', bbox_to_anchor=(0.5,1.3))
+    box = sub2.get_position()
+    sub2.set_position([box.x0, box.y0, box.width, box.height*0.6])
+    sub2.legend(labels_info, loc='lower center', bbox_to_anchor=(0.5,1.3))
       
     round_info = []
     avg_info_rcv = []
@@ -122,29 +131,29 @@ def plot(stats, stats_per_epoch, theoretical_total_msg, no_entities, sim_descrip
         msg_exchanged_vs_theoretical.append(stats_per_epoch[i][5]/theoretical_total_msg[i])
         i_round.append(i+1)
     
-
+    sub3 = fig.add_subplot(2,2,(3,4))
     # this plots the msg exchanges occurred against the theoretical ones 
-    axs[2].bar(i_round, msg_exchanged_vs_theoretical, width=1, color='tab:gray', label="% msg exchanged vs\ntheoretical total")
+    sub3.bar(i_round, msg_exchanged_vs_theoretical, width=1, color='tab:gray', label="% msg exchanged vs\ntheoretical total")
 
     # these plot stats about the average percentage of msg received per simulation
-    axs[2].plot(i_round, avg_info_rcv, marker='o', color='tab:blue', linestyle='-', label="Avg info msg received")
-    axs[2].plot(i_round, avg_sos_rcv, marker='o', color='tab:orange', linestyle='-', label="Avg sos msg received")
+    sub3.plot(i_round, avg_info_rcv, marker='o', color='tab:blue', linestyle='-', label="Avg info msg received")
+    sub3.plot(i_round, avg_sos_rcv, marker='o', color='tab:orange', linestyle='-', label="Avg sos msg received")
     
-    axs[2].plot(i_round, avg_fault_rate, marker='o', color='tab:red', linestyle='-', label="Avg fault rate")
-    axs[2].errorbar(i_round, avg_info_rcv, yerr=[lb_ci_info_rcv, ub_ci_info_rcv], fmt='.', color='tab:blue', ecolor='tab:blue', capsize=5)
-    axs[2].errorbar(i_round, avg_sos_rcv, yerr=[lb_ci_sos_rcv, ub_ci_sos_rcv], fmt='.', color='tab:orange', ecolor='tab:orange', capsize=5)
-    axs[2].errorbar(i_round, avg_fault_rate, yerr=[lb_ci_fault_rate, ub_ci_fault_rate], fmt='.', color='tab:red', ecolor='tab:red', capsize=5)
-    axs[2].plot(i_round, entities_involved_disaster, marker='.', color='k', linestyle='dotted', label="% nodes involved in\ndisasters")
+    sub3.plot(i_round, avg_fault_rate, marker='o', color='tab:red', linestyle='-', label="Avg fault rate")
+    sub3.errorbar(i_round, avg_info_rcv, yerr=[lb_ci_info_rcv, ub_ci_info_rcv], fmt='.', color='tab:blue', ecolor='tab:blue', capsize=5)
+    sub3.errorbar(i_round, avg_sos_rcv, yerr=[lb_ci_sos_rcv, ub_ci_sos_rcv], fmt='.', color='tab:orange', ecolor='tab:orange', capsize=5)
+    sub3.errorbar(i_round, avg_fault_rate, yerr=[lb_ci_fault_rate, ub_ci_fault_rate], fmt='.', color='tab:red', ecolor='tab:red', capsize=5)
+    sub3.plot(i_round, entities_involved_disaster, marker='.', color='k', linestyle='dotted', label="% nodes involved in\ndisasters")
 
-    axs[2].xaxis.set_major_locator(MaxNLocator(integer=True))
-    axs[2].set_xlabel('# Simulation')
-    axs[2].set_ylabel('Percentage (%)')
-    axs[2].set_ylim(top=1.1)
+    sub3.xaxis.set_major_locator(MaxNLocator(integer=True))
+    sub3.set_xlabel('# Simulation')
+    sub3.set_ylabel('Percentage (%)')
+    sub3.set_ylim(top=1.1)
     #axs[1].legend(bbox_to_anchor=(0, 0))
-    box = axs[2].get_position()
-    axs[2].set_position([box.x0, box.y0, box.width*0.6, box.height])
-    axs[2].legend(loc='center left', bbox_to_anchor=(1,0.5))
-    axs[2].xaxis.set_minor_formatter(FormatStrFormatter(round_info))
+    box = sub3.get_position()
+    sub3.set_position([box.x0, box.y0, box.width*0.6, box.height])
+    sub3.legend(loc='center left', bbox_to_anchor=(1,0.5))
+    sub3.xaxis.set_minor_formatter(FormatStrFormatter(round_info))
     print(sim_description)      #   REMEMBER TO COPY THIS: IT'S FOR THE CAPTION IN THE REPORT
     plt.show()
 
