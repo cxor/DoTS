@@ -9,6 +9,7 @@ class Node:
 
     LOG = False
     SPECTRUM = 0.65
+    MAX_SPEED = 28
     
     def __init__(self, id=0, signal=0, speed=[10,20], \
         mem_capacity=100, navigator=None, fault=0, \
@@ -37,6 +38,9 @@ class Node:
 
     def get_position(self):
         return self.navigator.get_position()
+    
+    def get_next_position(self, update=False):
+        return self.navigator.get_next_position(movement=round(self.speed), update=False)
 
     def set_position(self, coordinates):
         self.position = coordinates
@@ -108,8 +112,26 @@ class Node:
                     
     def get_signal_sensitivity(self, receiver):
         distance = self.get_distance(receiver)
-        signal_sensitivity = numpy.e ** (-1 * distance / self.signal)
+        next_distance = self.get_distance(receiver)
+        current_signal_sensitivity = numpy.e ** (-1 * distance / self.signal)
+        next_signal_sensitivity = numpy.e ** (-1 * next_distance / self.signal)
+        alpha = self.speed / Node.MAX_SPEED
+        signal_sensitivity = alpha * next_signal_sensitivity + (1-alpha) * current_signal_sensitivity
         return signal_sensitivity
+
+    def get_next_distance(self, entity):
+        x_position = self.get_next_position(update=False)[0]
+        y_position = self.get_next_position(update=False)[1]
+        if isinstance(entity, Sink):
+            x_entity_position = entity.get_position()[0]
+            y_entity_position = entity.get_position()[1]
+        elif isinstance(entity, Node):
+            x_entity_position = entity.get_next_position(update=False)[0]
+            y_entity_position = entity.get_next_position(update=False)[1]
+        distance = abs(x_position - x_entity_position) \
+                   + abs(y_position - y_entity_position)
+        return distance
+            
 
     def get_distance(self, entity):
         x_position = self.get_position()[0]
