@@ -96,7 +96,7 @@ class Sink:
     def crash(self, disaster=False):
         fault_chance = self.fault
         if disaster:
-            fault_chance = numpy.random.uniform(0.5, 1-fault_chance) 
+            fault_chance = numpy.random.uniform(0.5, 1) 
         fault_happens = numpy.random.uniform(0,1)
         if fault_chance <= fault_happens:
             self.no_faults += 1

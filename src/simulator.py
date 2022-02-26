@@ -11,6 +11,7 @@ from scipy.stats import norm
 class Simulator:
 
     LOG = True
+    REBOOT_TIME = 5
     
     def __init__(self,no_nodes, no_sinks, node_signal,\
         sink_signal, node_speed=[10,20], fault=0, disaster=0, \
@@ -143,8 +144,9 @@ class Simulator:
                 reboot_elapsed_time = entity.get_reboot()
                 if reboot_elapsed_time == 0:
                     entity.set_status(1)
-                    entity.set_reboot(5)
+                    entity.set_reboot(Simulator.REBOOT_TIME)
                 else:
+                   # entity.no_faults += 1
                     entity.set_reboot(reboot_elapsed_time - 1)
                 
     def simulate_disaster(self):
