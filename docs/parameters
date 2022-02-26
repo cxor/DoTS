@@ -1,6 +1,6 @@
-rounds          	3
+rounds          	20
 duration        	120
-map-size        	100		100
+map-size        	500		500
 nodes-speed     	12		18      16
 nodes-number		20 		30		40
 sinks-number		10		15		20

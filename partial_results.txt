@@ -1,8 +1,0 @@
-1) Aumentare la potenza di trasmissione dei nodi non risulta automaticamente in un average drop rate minore perché avvengono molti più tentativi di scambio di messaggi, quindi è più probabile avere delle interferenze che aumentano il drop rate
-
-2) Si può ottenere un drop rate all'incirca equivalente se si aumenta il numero di nodi (50 anziché 20), a fronte di una riduzione del segnale dei nodi (12 anziché 20)
-
-3) La hard threshold è un fattore fondamentale perché limita il numero di scambi di messaggi totali; il risultato è che nella media x/totali si mostrerà un valore più alto riscontrabile 
-
-valuta le performance del sistema al variare del numero dei nodi e del loro segnale
-python core.py --rounds 3 --duration 2 --map-size 50 50 --nodes-speed 8 13 --nodes-number 20 20 40 --sinks-number 16 16 16 --nodes-signal 12 20 12 --sinks-signal 15 15 15 --transmission-rate 10 10 10 --fault-rate 0.1 0.1 0.1 --disaster-rate 0.1 0.1 0.1
